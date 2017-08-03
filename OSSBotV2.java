@@ -50,6 +50,7 @@ import scripts.ossbot.commands.Config;
 import scripts.ossbot.commands.Data;
 import scripts.ossbot.commands.Examine;
 import scripts.ossbot.commands.Fact;
+import scripts.ossbot.commands.Flipcoin;
 import scripts.ossbot.commands.Help;
 import scripts.ossbot.commands.Joke;
 import scripts.ossbot.commands.Levelup;
@@ -390,7 +391,8 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				new Fact(),
 				new Offsite(),
 				new Examine(),
-				new Screenie());
+				new Screenie(),
+				new Flipcoin());
 
 		General.println("Commands created.");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
