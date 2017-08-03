@@ -364,7 +364,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 	@Override
 	public void onEnd() {
-
+		General.println("Shutting down...");
 	}
 
 	@Override
