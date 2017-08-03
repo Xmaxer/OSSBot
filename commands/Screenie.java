@@ -30,24 +30,26 @@ public class Screenie extends Command{
 		{
 			try {
 				String imgurID = OssBotMethods.getImgurContent(fileName, "Taken by OSS Bot", Paths.get("").toAbsolutePath().toString() + OssBotConstants.SEPARATOR + "screenshots" + OssBotConstants.SEPARATOR + fileName);
-				BotFiles.botLogger("Successfully took a screenshot and uploaded.");
+				
 				if(imgurID != null)
 				{
+					BotFiles.botLogger("Successfully took a screenshot and uploaded.");
 					String result = "";
-					for(int i = 0, n = imgurID.length(); i < n; i++)
+					String albumID = OssBotConstants.IMGUR_ALBUM_ID;
+					for(int i = 0, n = albumID.length(); i < n; i++)
 					{
-						if(Character.isUpperCase(imgurID.charAt(i)))
+						if(Character.isUpperCase(albumID.charAt(i)))
 						{
-							result += "—" + String.valueOf(imgurID.charAt(i)).toUpperCase();
+							result += "—" + String.valueOf(albumID.charAt(i)).toUpperCase();
 						}
 						else
 						{
-							result += String.valueOf(imgurID.charAt(i));
+							result += String.valueOf(albumID.charAt(i));
 						}
 
 					}
-					result = "i—.—imgur-—d()t—-c0m/" + result + ".—png";
-					Messenger.messageFormatter("full link to screenshot: " + result);
+					result = "imgur-—d()t—-c0m/a/" + result;
+					Messenger.messageFormatter("full link to album: " + result);
 				}
 			} catch (Exception e) {
 				OssBotMethods.printException(e);

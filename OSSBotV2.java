@@ -358,10 +358,6 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 		BotFiles.botLogger("Account is now banned or locked, shutting down.");
 	}
 
-
-
-
-
 	@Override
 	public void onEnd() {
 		General.println("Shutting down...");

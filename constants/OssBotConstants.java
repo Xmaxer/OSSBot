@@ -60,6 +60,7 @@ public final class OssBotConstants {
 	public final static String CML_UPDATE_LINK = "http://crystalmathlabs.com/tracker/api.php?type=update&player=";
 	public final static String CML_TRACKING_LINK = "http://crystalmathlabs.com/tracker/api.php?type=track&player=";
 	public final static String RANDOM_FACT_API = "http://numbersapi.com/random/";
-	public final static String IMGUR_CLIENT_ID = "4d6406c2668caac";
+	public final static String IMGUR_PROPERTIES = "imgur.properties";
+	public final static String IMGUR_ALBUM_ID = "UFPjs";
 }
 
