@@ -7,7 +7,7 @@ public final class OssBotConstants {
 	public final static String SEPARATOR = System.getProperty("file.separator");
 	public final static int MAX_MESSAGE_LENGTH = 79;
 	public final static int GAME_TICK = 650;
-	public final static int TIMEOUT_DURATION = 15;
+	public final static int TIMEOUT_DURATION = 20;
 	public final static int[] CC_PLAYER_INTERFACE = {7,14};
 	public final static int[] FRIENDS_LIST_PLAYER_INTERFACE = {429,8};
 	public final static int[] JOIN_CLAN_BUTTON = {7, 17};
