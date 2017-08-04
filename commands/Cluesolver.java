@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
@@ -66,9 +67,9 @@ public class Cluesolver extends Command{
 		}
 	}
 	private void getAnagram(String anagramToLookFor) {
-		File cipherFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.CIPHER_FILE);
+		File anagramFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.ANAGRAM_FILE);
 
-		ArrayList<String[]> data = getData(cipherFile);
+		ArrayList<String[]> data = getData(anagramFile);
 
 		anagramToLookFor = anagramToLookFor.toLowerCase().replaceAll("_", " ");
 
@@ -79,7 +80,7 @@ public class Cluesolver extends Command{
 				String anagram = dataPiece[0].toLowerCase();
 				if(anagram.equalsIgnoreCase(anagramToLookFor))
 				{
-					Messenger.messageFormatter("Npc: " + dataPiece[1] + " location: " + dataPiece[2] + " answer: " + dataPiece[3]);
+					Messenger.messageFormatter("Npc: " + dataPiece[1] + " | location: " + dataPiece[2] + " | answer: " + dataPiece[3]);
 					return;
 				}
 			}
@@ -89,9 +90,9 @@ public class Cluesolver extends Command{
 
 	}
 	private void getCryptic(String crypticToLookFor) {
-		File cipherFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.CIPHER_FILE);
+		File crypticFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.CRYPTIC_FILE);
 
-		ArrayList<String[]> data = getData(cipherFile);
+		ArrayList<String[]> data = getData(crypticFile);
 
 		crypticToLookFor = crypticToLookFor.toLowerCase().replaceAll("_", " ");
 
@@ -126,7 +127,7 @@ public class Cluesolver extends Command{
 				String cipher = dataPiece[0].toLowerCase();
 				if(cipher.equalsIgnoreCase(cipherToLookFor))
 				{
-					Messenger.messageFormatter(dataPiece[1] + " answer: " + dataPiece[2]);
+					Messenger.messageFormatter(dataPiece[1] + " | answer: " + dataPiece[2]);
 					return;
 				}
 			}
