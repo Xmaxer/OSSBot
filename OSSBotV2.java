@@ -58,6 +58,7 @@ import scripts.ossbot.commands.Levelup;
 import scripts.ossbot.commands.Offsite;
 import scripts.ossbot.commands.Poll;
 import scripts.ossbot.commands.Price;
+import scripts.ossbot.commands.Qfc;
 import scripts.ossbot.commands.Screenie;
 import scripts.ossbot.commands.Time;
 import scripts.ossbot.commands.Top;
@@ -391,7 +392,8 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				new Examine(),
 				new Screenie(),
 				new Flipcoin(),
-				new Cluesolver());
+				new Cluesolver(),
+				new Qfc());
 
 		General.println("Commands created.");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
