@@ -71,11 +71,11 @@ public class Poll extends Command{
 		{
 			if(level >= 3)
 			{
-				if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][1]))
+				if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][0]))
 				{
 					voteInCompPoll(commandParams[2]);
 				}
-				else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][2]))
+				else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][1]))
 				{
 					createNewCompPoll(commandParams[2]);
 				}
