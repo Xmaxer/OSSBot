@@ -12,8 +12,6 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.TimeZone;
 
-import org.tribot.api.General;
-
 import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
@@ -25,7 +23,7 @@ import scripts.ossbot.methods.Ranking;
 public class Poll extends Command{
 	private final int DEFAULT_RANK_REQUIREMENT = 0;
 	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"comp", "quick"},{"insertPoll", "vote", "create"},{"insertVoteHere", "insertThreeSkills"}};
+	private final String[][] STATIC_COMMAND_PARAMS = {{"comp"},{"vote", "create"},{"insertVoteHere", "insertThreeSkills"}};
 	private int level = 0;
 
 	public Poll()
@@ -62,13 +60,6 @@ public class Poll extends Command{
 				else
 				{
 					compPolling(commandParams);
-				}
-			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][1]))
-			{
-				if(level >= 2)
-				{
-					startQuickPoll(commandParams[1]);
 				}
 			}
 		}
@@ -237,29 +228,6 @@ public class Poll extends Command{
 			}
 		}
 		Messenger.messageFormatter(vote + " is not a valid vote. Try: " + allProps);
-
-	}
-	private void startQuickPoll(String toVote) {
-		
-		if(toVote.length() >= 2)
-		{
-			OSSBotV2.flashPoll = true;
-			
-			Messenger.messageFormatter(toVote + " || Y or N in chat to vote.");
-			int counter = 0;
-			
-			while(counter <= 10)
-			{
-				counter++;
-				General.sleep(1000);
-			}
-			
-			OSSBotV2.flashPoll = false;
-			
-			Messenger.messageFormatter("Yes: " + OSSBotV2.yesVotes + " || No: " + OSSBotV2.noVotes);
-			OSSBotV2.noVotes = 0;
-			OSSBotV2.yesVotes = 0;
-		}
 
 	}
 	@Override

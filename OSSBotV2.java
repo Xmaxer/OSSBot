@@ -82,9 +82,6 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 	private boolean isBanned = false;
 	private long lastClicked = System.currentTimeMillis();
 	private long lastTracked = ZonedDateTime.now().toInstant().toEpochMilli();
-	public static boolean flashPoll = false;
-	public static int noVotes = 0;
-	public static int yesVotes = 0;
 	
 	@Override
 	public void run() {
@@ -425,21 +422,6 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 		if(message.toLowerCase().contains("Attempting to kick player from friends chat...".toLowerCase()))
 		{
 			kickMessage(name);
-		}
-		if(flashPoll)
-		{
-			if(message.length() <= 3)
-			{
-				if(message.toLowerCase().startsWith("y"))
-				{
-					yesVotes++;
-				}
-				else if(message.toLowerCase().startsWith("n"))
-				{
-					noVotes++;
-				}
-			}
-			return;
 		}
 		isItACommand(name, message, botName);
 	}
