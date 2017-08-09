@@ -9,11 +9,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Scanner;
@@ -728,10 +731,103 @@ public class BotFiles {
 			String rankCounts = String.join("\t", rankCountString);
 			fw.write(time + "\t" + players + "\t" + rankCounts + System.lineSeparator());
 			fw.close();
+
+			findDayAverage(trackingFile);
 		} catch(Exception e)
 		{
 			OssBotMethods.printException(e);
 		}
+	}
+	private static void findDayAverage(File trackingFile) {
+		File playerCountFile = trackingFile;
+		File dayAverages = new File(OssBotConstants.MAIN_PATH + OssBotConstants.SEPARATOR + OssBotConstants.PLAYER_COUNT_DAY_TRACKING_FILE);
+
+		try{
+			dayAverages.delete();
+		} catch(Exception e){}
+		
+		try{
+			dayAverages.createNewFile();
+
+			Scanner s = new Scanner(playerCountFile);
+
+			LinkedHashMap<String, ArrayList<Integer>> data = new LinkedHashMap<String, ArrayList<Integer>>();
+
+			while(s.hasNextLine())
+			{
+				String[] lineSplit = s.nextLine().split("\t");
+
+				String day = DateTimeFormatter.ofPattern("EEEE").format(ZonedDateTime.parse(lineSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+				if(!data.containsKey(day))
+				{
+					ArrayList<Integer> newList = new ArrayList<Integer>();
+					for(int i = 0; i <= 10; i++)
+						newList.add(0);
+					data.put(day, newList);
+				}
+
+				ArrayList<Integer> dataList = data.get(day);
+
+				ArrayList<Integer> currentData = new ArrayList<Integer>();
+
+				for(int i = 1; i < lineSplit.length; i++)
+					currentData.add(Integer.valueOf(lineSplit[i]));
+
+				for(int i = 0; i < dataList.size(); i++)
+				{
+					if(i == 0)
+					{
+						dataList.set(0, dataList.get(0) + 1);
+						continue;
+					}
+
+					dataList.set(i, dataList.get(i) + currentData.get(i-1));
+				}
+
+				data.put(day, dataList);
+
+			}
+			s.close();
+			LinkedHashMap<String, ArrayList<Double>> averages = new LinkedHashMap<String, ArrayList<Double>>();
+
+			for(Map.Entry<String, ArrayList<Integer>> entry : data.entrySet())
+			{
+				int x = 0;
+				ArrayList<Double> average = new ArrayList<Double>();
+				int numberOf = entry.getValue().get(0);
+				for(Integer num : entry.getValue())
+				{
+					if(x == 0)
+					{
+						x++;
+						continue;
+					}
+					average.add(Double.parseDouble(String.valueOf(Double.valueOf(num)/Double.valueOf(numberOf))));
+				}
+
+				averages.put(entry.getKey(), average);
+			}
+
+
+			FileWriter fw = new FileWriter(dayAverages, true);
+			for(Map.Entry<String, ArrayList<Double>> entry : averages.entrySet())
+			{
+				fw.write(entry.getKey() + "\t");
+				for(double avg : entry.getValue())
+				{	
+					fw.write(new DecimalFormat("##0.0#").format(avg) + "\t");
+					//System.out.println();
+				}
+				fw.write(System.lineSeparator());
+			}
+
+			fw.close();
+		} catch(Exception e)
+		{
+			OssBotMethods.printException(e);
+		}
+
 	}
 	public static String checkLevelParams(String level, String command, String executedCommandName) {
 		File[] allLevelParams = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + executedCommandName + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + level + OssBotConstants.SEPARATOR).listFiles();

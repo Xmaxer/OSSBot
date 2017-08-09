@@ -49,6 +49,7 @@ public final class OssBotConstants {
 	public final static String VOTES_FILE = "votes.txt";
 	public final static String JOKES_FILE = "jokes.txt";
 	public final static String PLAYER_COUNT_TRACKING_FILE = "playerCount.txt";
+	public final static String PLAYER_COUNT_DAY_TRACKING_FILE = "playerCountDay.txt";
 	public final static String POLLING_DIRECTORY = MAIN_PATH + SEPARATOR + "competition_polls" + SEPARATOR;
 	public final static String SCREENSHOTS_DIRECTORY = MAIN_PATH + SEPARATOR + "screenshots" + SEPARATOR;
 	public final static String CML_COMP_LINK = "http://crystalmathlabs.com/tracker/api.php?type=comprankings&competition=";
