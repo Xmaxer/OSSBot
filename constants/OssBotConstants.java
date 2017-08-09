@@ -2,6 +2,8 @@ package scripts.ossbot.constants;
 
 import java.nio.file.Paths;
 
+import scripts.ossbot.methods.OssBotMethods;
+
 public final class OssBotConstants {
 	
 	public final static String SEPARATOR = System.getProperty("file.separator");
@@ -65,5 +67,8 @@ public final class OssBotConstants {
 	public final static String ANAGRAM_FILE = "anagrams.txt";
 	public final static String CIPHER_FILE = "ciphers.txt";
 	public final static String CRYPTIC_FILE = "cryptics.txt";
+	public final static String PASTE_BIN_API_KEY = "***REMOVED***";
+	public final static String PASTE_BIN_USER_KEY = "***REMOVED***";
+	public final static Long INACTIVITY_ALLOWED = OssBotMethods.getTimeInMillis("2w");
 }
 

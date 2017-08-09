@@ -26,10 +26,7 @@ public class Cleanup extends Command{
 	private final int DEFAULT_RANK_REQUIREMENT = 5;
 	private final String COMMAND_NAME = this.getClass().getSimpleName();
 	private final String[][] STATIC_COMMAND_PARAMS = {};
-	public final String API_KEY = "***REMOVED***";
-	public final String USER_KEY = "***REMOVED***";
-	public final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
-	public final Long differenceAllowed = OssBotMethods.getTimeInMillis("2w");
+
 	public enum Flags {
 		RANKED_BUT_NO_SHEET_DATA,
 		SHEET_DATA_BUT_NO_BOT_DATA,
@@ -119,7 +116,7 @@ public class Cleanup extends Command{
 
 							Long difference = ZonedDateTime.now().toInstant().toEpochMilli() - lastSeen;
 
-							if(difference >= differenceAllowed)
+							if(difference >= OssBotConstants.INACTIVITY_ALLOWED)
 							{
 								flags.add(Flags.INACTIVE);
 							}
@@ -270,13 +267,13 @@ public class Cleanup extends Command{
 			con.setDoInput(true);
 			con.setDoOutput(true);
 			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			con.setRequestProperty("User-Agent", USER_AGENT);
+			con.setRequestProperty("User-Agent", OssBotConstants.USER_AGENT);
 
 			con.connect();
 
 			String pasteName = "Cleanup List by " + OSSBotV2.getIssuerName() + " - " + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MMM d yyyy HH-mm-ss z"));
 			String pasteFormat = "text";
-			String data = "api_option=paste&api_user_key=" + USER_KEY + "&api_dev_key=" + API_KEY + "&api_paste_private=1&api_paste_name=" + pasteName + "&api_paste_expire_date=1M&api_paste_format=" + pasteFormat + "&api_paste_code=" + pasteText;
+			String data = "api_option=paste&api_user_key=" + OssBotConstants.PASTE_BIN_USER_KEY + "&api_dev_key=" + OssBotConstants.PASTE_BIN_API_KEY + "&api_paste_private=1&api_paste_name=" + pasteName + "&api_paste_expire_date=1M&api_paste_format=" + pasteFormat + "&api_paste_code=" + pasteText;
 
 			OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream());
 			writer.write(data);
