@@ -54,6 +54,7 @@ import scripts.ossbot.commands.Examine;
 import scripts.ossbot.commands.Fact;
 import scripts.ossbot.commands.Flipcoin;
 import scripts.ossbot.commands.Help;
+import scripts.ossbot.commands.Info;
 import scripts.ossbot.commands.Joke;
 import scripts.ossbot.commands.Levelup;
 import scripts.ossbot.commands.Offsite;
@@ -395,7 +396,8 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				new Flipcoin(),
 				new Cluesolver(),
 				new Qfc(),
-				new Cleanup());
+				new Cleanup(),
+				new Info());
 
 		General.println("Commands created.");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

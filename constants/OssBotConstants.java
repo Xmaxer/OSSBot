@@ -71,5 +71,6 @@ public final class OssBotConstants {
 	public final static String PASTE_BIN_API_KEY = "***REMOVED***";
 	public final static String PASTE_BIN_USER_KEY = "***REMOVED***";
 	public final static Long INACTIVITY_ALLOWED = OssBotMethods.getTimeInMillis("2w");
+	public final static String VULTR_API_KEY = "***REMOVED***";
 }
 
