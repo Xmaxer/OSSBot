@@ -45,6 +45,7 @@ import scripts.ossbot.commands.Ball8;
 import scripts.ossbot.commands.CML;
 import scripts.ossbot.commands.Calc;
 import scripts.ossbot.commands.Caps;
+import scripts.ossbot.commands.Cleanup;
 import scripts.ossbot.commands.Cluesolver;
 import scripts.ossbot.commands.Comp;
 import scripts.ossbot.commands.Config;
@@ -393,7 +394,8 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				new Screenie(),
 				new Flipcoin(),
 				new Cluesolver(),
-				new Qfc());
+				new Qfc(),
+				new Cleanup());
 
 		General.println("Commands created.");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

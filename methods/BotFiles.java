@@ -452,6 +452,7 @@ public class BotFiles {
 						}
 						props.setProperty("joinDate", allData.get(i + 2));
 						props.setProperty("days", allData.get(i + 3));
+						props.setProperty("sheetRank", allData.get(i + 1));
 						storeProperties(props, sheetConfig);
 						exists = true;
 						break;
@@ -538,7 +539,7 @@ public class BotFiles {
 	public static void updateTimeProperties(String playerWorld, File playerTimePropertiesFile) {
 
 		Properties playerProperties = new Properties();
-		
+
 		String timeSpentDayPropertyKey = DateTimeFormatter.ofPattern("EEEE").format(ZonedDateTime.now());
 		String lastSeenPropertyKey = "lastSeen";
 		String timeSpentPropertyKey = "timeSpent";
@@ -548,12 +549,12 @@ public class BotFiles {
 				InputStream input = new FileInputStream(playerTimePropertiesFile.getAbsolutePath());
 				playerProperties.load(input);
 				input.close();
-				
+
 				String lastSeen = playerProperties.getProperty(lastSeenPropertyKey);
 				String timeSpent = playerProperties.getProperty(timeSpentPropertyKey);
 				String worldTimeSpent = playerProperties.getProperty(playerWorld);
 				String dayTimeSpent = playerProperties.getProperty(timeSpentDayPropertyKey);
-				
+
 				if(worldTimeSpent == null)
 				{
 					playerProperties.setProperty(playerWorld, "0");
@@ -569,13 +570,13 @@ public class BotFiles {
 				if(dayTimeSpent == null)
 				{
 					playerProperties.setProperty(timeSpentDayPropertyKey, "0");
-					
+
 				}
 				worldTimeSpent = playerProperties.getProperty(playerWorld);
 				lastSeen = playerProperties.getProperty(lastSeenPropertyKey);
 				timeSpent = playerProperties.getProperty(timeSpentPropertyKey);
 				dayTimeSpent = playerProperties.getProperty(timeSpentDayPropertyKey);
-				
+
 				long difference = ZonedDateTime.now().toInstant().toEpochMilli() - Long.valueOf(lastSeen);
 				lastSeen = String.valueOf(ZonedDateTime.now().toInstant().toEpochMilli());
 
@@ -590,7 +591,7 @@ public class BotFiles {
 				playerProperties.setProperty(timeSpentPropertyKey, timeSpent);
 				playerProperties.setProperty(playerWorld, worldTimeSpent);
 				playerProperties.setProperty(timeSpentDayPropertyKey, dayTimeSpent);
-				
+
 				OutputStream output = new FileOutputStream(playerTimePropertiesFile.getAbsolutePath());
 				playerProperties.store(output, null);
 				output.close();
