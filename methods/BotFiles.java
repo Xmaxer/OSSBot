@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -757,7 +758,7 @@ public class BotFiles {
 			{
 				String[] lineSplit = s.nextLine().split("\t");
 
-				String day = DateTimeFormatter.ofPattern("EEEE").format(ZonedDateTime.parse(lineSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				String day = DateTimeFormatter.ofPattern("EEEE").format(LocalDateTime.parse(lineSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 				if(!data.containsKey(day))
 				{

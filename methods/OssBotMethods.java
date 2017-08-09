@@ -136,9 +136,16 @@ public class OssBotMethods {
 
 	public static void printException(Exception e) {
 		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
+		PrintWriter pw = new PrintWriter(sw, true);
 		e.printStackTrace(pw);
-		General.println(sw.toString());
+
+		String[] errorLines = sw.toString().replaceAll(System.lineSeparator(), "").split("\t");
+
+		for(String errorLine : errorLines)
+		{
+			General.println(errorLine);
+			BotFiles.botLogger(errorLine);
+		}
 		//Messenger.messageFormatter("Error occured, logged it. (Tell xmax or cynes or something though)");
 	}
 
@@ -245,66 +252,66 @@ public class OssBotMethods {
 		return totalTimeInMillis;
 	}
 
-	
+
 	private static String getAccessToken()
 	{
 		try{
-		File imgurFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + "Screenie" + OssBotConstants.SEPARATOR + OssBotConstants.IMGUR_PROPERTIES);
-		Properties props = BotFiles.getProperties(imgurFile);
-		
-		String clientID = props.getProperty("client_id");
-		String clientSecret = props.getProperty("client_secret");
-		String refreshToken = props.getProperty("refresh_token");
-		String accessToken = props.getProperty("access_token");
-		
-		
-    	URL url = new URL("https://api.imgur.com/oauth2/token");
-        String data = "refresh_token=" + refreshToken + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=refresh_token";
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			File imgurFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + "Screenie" + OssBotConstants.SEPARATOR + OssBotConstants.IMGUR_PROPERTIES);
+			Properties props = BotFiles.getProperties(imgurFile);
 
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-        conn.setRequestProperty("Content-Type",
-                "application/x-www-form-urlencoded");
-       
-        
-        conn.connect();
-        StringBuilder stb = new StringBuilder();
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        wr.write(data);
-        wr.flush();
+			String clientID = props.getProperty("client_id");
+			String clientSecret = props.getProperty("client_secret");
+			String refreshToken = props.getProperty("refresh_token");
+			String accessToken = props.getProperty("access_token");
 
-        // Get the response
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            stb.append(line).append("\n");
-        }
-        wr.close();
-        rd.close();
-        
-        String response = stb.toString();
-        
-        Matcher m = Pattern.compile("access_token\":\"(.*?)\".*refresh_token\":\"(.*?)\"").matcher(response);
-        
-        if(m.find())
-        {
-        	if(m.groupCount() == 2)
-        	{
-        		accessToken = m.group(1);
-        		refreshToken = m.group(2);
-        		
-        		props.setProperty("access_token", accessToken);
-        		props.setProperty("refresh_token", refreshToken);
-        		
-        		BotFiles.storeProperties(props, imgurFile);
-        		
-        		return accessToken;
-        	}
-        }
+
+			URL url = new URL("https://api.imgur.com/oauth2/token");
+			String data = "refresh_token=" + refreshToken + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=refresh_token";
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+
+
+			conn.connect();
+			StringBuilder stb = new StringBuilder();
+			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+			wr.write(data);
+			wr.flush();
+
+			// Get the response
+			BufferedReader rd = new BufferedReader(
+					new InputStreamReader(conn.getInputStream()));
+			String line;
+			while ((line = rd.readLine()) != null) {
+				stb.append(line).append("\n");
+			}
+			wr.close();
+			rd.close();
+
+			String response = stb.toString();
+
+			Matcher m = Pattern.compile("access_token\":\"(.*?)\".*refresh_token\":\"(.*?)\"").matcher(response);
+
+			if(m.find())
+			{
+				if(m.groupCount() == 2)
+				{
+					accessToken = m.group(1);
+					refreshToken = m.group(2);
+
+					props.setProperty("access_token", accessToken);
+					props.setProperty("refresh_token", refreshToken);
+
+					BotFiles.storeProperties(props, imgurFile);
+
+					return accessToken;
+				}
+			}
 		} catch(Exception e) {
 			printException(e);
 		}
@@ -320,11 +327,11 @@ public class OssBotMethods {
 		File file = new File(fileURL);
 		//read image
 		image = ImageIO.read(file);
-	    int x = 0, y = 480, w = 520, h = 140;
-	    BufferedImage dst = new BufferedImage(w , h, BufferedImage.TYPE_INT_ARGB);
-	    dst.getGraphics().drawImage(image, 0, 0, w, h, x, y - h, x + w, y, null);
-	    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-	    ImageIO.write(dst, "png", byteArray);
+		int x = 0, y = 480, w = 520, h = 140;
+		BufferedImage dst = new BufferedImage(w , h, BufferedImage.TYPE_INT_ARGB);
+		dst.getGraphics().drawImage(image, 0, 0, w, h, x, y - h, x + w, y, null);
+		ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+		ImageIO.write(dst, "png", byteArray);
 		byte[] byteImage = byteArray.toByteArray();
 		String dataImage = Base64.getEncoder().encodeToString(byteImage);
 		String data = URLEncoder.encode("image", "UTF-8") + "="
