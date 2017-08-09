@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -143,12 +144,28 @@ public class OssBotMethods {
 
 		for(String errorLine : errorLines)
 		{
-			General.println(errorLine);
 			BotFiles.botLogger(errorLine);
 		}
 		//Messenger.messageFormatter("Error occured, logged it. (Tell xmax or cynes or something though)");
 	}
-
+	public static String uploadToImgur(String fileName, String albumID)
+	{
+		String result = "";
+		try {
+			String imgurID = OssBotMethods.getImgurContent(fileName, "Taken by OSS Bot", Paths.get("").toAbsolutePath().toString() + OssBotConstants.SEPARATOR + "screenshots" + OssBotConstants.SEPARATOR + fileName, albumID);
+			
+			if(imgurID != null)
+			{
+				BotFiles.botLogger("Successfully took a screenshot and uploaded.");
+				result = OssBotMethods.convertAlbumID(albumID);
+				result = "imgur-—d()t—-c0m/a/" + result;
+			}
+		} catch (Exception e) {
+			OssBotMethods.printException(e);
+		}
+		
+		return result;
+	}
 	public static String[] getcommandParams(String fullCommand)
 	{
 		if(fullCommand.contains("'"))
@@ -317,7 +334,24 @@ public class OssBotMethods {
 		}
 		return null;
 	}
-	public static String getImgurContent(String title, String desc, String fileURL) throws Exception {
+	public static String convertAlbumID(String albumID)
+	{
+		String result = "";
+		for(int i = 0, n = albumID.length(); i < n; i++)
+		{
+			if(Character.isUpperCase(albumID.charAt(i)))
+			{
+				result += "—" + String.valueOf(albumID.charAt(i)).toUpperCase();
+			}
+			else
+			{
+				result += String.valueOf(albumID.charAt(i));
+			}
+
+		}
+		return result;
+	}
+	public static String getImgurContent(String title, String desc, String fileURL, String albumID) throws Exception {
 		String accessToken = getAccessToken();
 		URL url;
 		url = new URL("https://api.imgur.com/3/image");
@@ -335,7 +369,7 @@ public class OssBotMethods {
 		byte[] byteImage = byteArray.toByteArray();
 		String dataImage = Base64.getEncoder().encodeToString(byteImage);
 		String data = URLEncoder.encode("image", "UTF-8") + "="
-				+ URLEncoder.encode(dataImage, "UTF-8") + "&title=" + title + "&description=" + desc + "&album=" + OssBotConstants.IMGUR_ALBUM_ID;
+				+ URLEncoder.encode(dataImage, "UTF-8") + "&title=" + title + "&description=" + desc + "&album=" + albumID;
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
 		conn.setRequestMethod("POST");

@@ -1,6 +1,5 @@
 package scripts.ossbot.commands;
 
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,33 +27,7 @@ public class Screenie extends Command{
 		String fileName = "screenie - "  + OSSBotV2.getIssuerName() + " - " + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MMM d yyyy HH-mm-ss z")) + ".png";
 		if(Screenshots.take(fileName, false, true))
 		{
-			try {
-				String imgurID = OssBotMethods.getImgurContent(fileName, "Taken by OSS Bot", Paths.get("").toAbsolutePath().toString() + OssBotConstants.SEPARATOR + "screenshots" + OssBotConstants.SEPARATOR + fileName);
-				
-				if(imgurID != null)
-				{
-					BotFiles.botLogger("Successfully took a screenshot and uploaded.");
-					String result = "";
-					String albumID = OssBotConstants.IMGUR_ALBUM_ID;
-					for(int i = 0, n = albumID.length(); i < n; i++)
-					{
-						if(Character.isUpperCase(albumID.charAt(i)))
-						{
-							result += "—" + String.valueOf(albumID.charAt(i)).toUpperCase();
-						}
-						else
-						{
-							result += String.valueOf(albumID.charAt(i));
-						}
-
-					}
-					result = "imgur-—d()t—-c0m/a/" + result;
-					Messenger.messageFormatter("full link to album: " + result);
-				}
-			} catch (Exception e) {
-				OssBotMethods.printException(e);
-			}
-
+			Messenger.messageFormatter("full link to album: " + OssBotMethods.uploadToImgur(fileName, OssBotConstants.IMGUR_SCREENIE_ALBUM_ID));
 		}
 		else
 		{

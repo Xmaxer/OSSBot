@@ -64,7 +64,8 @@ public final class OssBotConstants {
 	public final static String CML_TRACKING_LINK = "http://crystalmathlabs.com/tracker/api.php?type=track&player=";
 	public final static String RANDOM_FACT_API = "http://numbersapi.com/random/";
 	public final static String IMGUR_PROPERTIES = "imgur.properties";
-	public final static String IMGUR_ALBUM_ID = "UFPjs";
+	public final static String IMGUR_SCREENIE_ALBUM_ID = "UFPjs";
+	public final static String IMGUR_KICK_ALBUM_ID = "5Ei68";
 	public final static String ANAGRAM_FILE = "anagrams.txt";
 	public final static String CIPHER_FILE = "ciphers.txt";
 	public final static String CRYPTIC_FILE = "cryptics.txt";

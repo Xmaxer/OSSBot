@@ -433,9 +433,10 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 	}
 	private void kickMessage(String name) {
 		BotFiles.botLogger(("Kick message detected."));
-		if(Screenshots.take("kick - "+ name + " - " + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MMM d yyyy HH-mm-ss z")) + ".png", false, false))
+		String fileName = "kick - "+ name + " - " + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MMM d yyyy HH-mm-ss z")) + ".png";
+		if(Screenshots.take(fileName, false, false))
 		{
-			BotFiles.botLogger("Successfully took screenshot of kick message.");
+			OssBotMethods.uploadToImgur(fileName, OssBotConstants.IMGUR_KICK_ALBUM_ID);
 		}
 		else
 		{

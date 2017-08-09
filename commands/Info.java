@@ -68,13 +68,6 @@ public class Info extends Command{
 
 		con.connect();
 
-		//		String data = "API-Key: " + API_KEY;
-		//		
-		//		OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream());
-		//		writer.write(data);
-		//		writer.flush();
-		//		writer.close();
-
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
 		String inputLine;
