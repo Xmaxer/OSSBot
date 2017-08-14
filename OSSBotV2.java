@@ -3,6 +3,8 @@ package scripts.ossbot;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,30 +42,7 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Starting;
 
 import scripts.ossbot.commandInterface.Command;
-import scripts.ossbot.commands.Announcement;
-import scripts.ossbot.commands.Ball8;
-import scripts.ossbot.commands.CML;
-import scripts.ossbot.commands.Calc;
-import scripts.ossbot.commands.Caps;
-import scripts.ossbot.commands.Cleanup;
-import scripts.ossbot.commands.Cluesolver;
-import scripts.ossbot.commands.Comp;
-import scripts.ossbot.commands.Config;
-import scripts.ossbot.commands.Data;
-import scripts.ossbot.commands.Examine;
-import scripts.ossbot.commands.Fact;
-import scripts.ossbot.commands.Flipcoin;
-import scripts.ossbot.commands.Help;
-import scripts.ossbot.commands.Info;
-import scripts.ossbot.commands.Joke;
-import scripts.ossbot.commands.Levelup;
-import scripts.ossbot.commands.Offsite;
-import scripts.ossbot.commands.Poll;
-import scripts.ossbot.commands.Price;
-import scripts.ossbot.commands.Qfc;
-import scripts.ossbot.commands.Screenie;
-import scripts.ossbot.commands.Time;
-import scripts.ossbot.commands.Top;
+import scripts.ossbot.commands.*;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
@@ -78,7 +57,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 	private static String issuerName = null;
 	private static String issuerCommand = null;
 	private static int issuerRank = -1;
-
+	private boolean endThread = false;
 	private boolean lock = false;
 	private boolean inCC = false;
 	private boolean loggedIn = false;
@@ -94,7 +73,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			@Override
 			public void run() {
 
-				while(true)
+				while(!endThread)
 				{
 					if(loggedIn && inCC)
 					{
@@ -167,7 +146,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			@Override
 			public void run() {
 
-				while(true)
+				while(!endThread)
 				{
 					if(Login.getLoginState().equals(Login.STATE.INGAME))
 					{
@@ -250,7 +229,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 			@Override
 			public void run() {
-				while(true)
+				while(!endThread)
 				{
 					if(loggedIn && !lock && inCC)
 					{
@@ -308,7 +287,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 			@Override
 			public void run() {
-				while(true)
+				while(!endThread)
 				{
 					String link = OssBotConstants.CML_COMP_LINK;
 					BotFiles.downloadCMLComp(link);
@@ -337,22 +316,33 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			try{
 				if(!webDownloader.isAlive())
 				{
+					endThread = false;
 					webDownloader.start();
 				}
 				if(!announcer.isAlive())
 				{
+					endThread = false;
 					announcer.start();
 				}
 				if(!loginTracker.isAlive())
 				{
+					endThread = false;
 					loginTracker.start();
 				}
 				if(!tracker.isAlive())
 				{
+					endThread = false;
 					tracker.start();
 				}
-			} catch (Exception e)
+			} 
+			catch (Exception e)
 			{
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				
+				General.println(sw.toString());
+				endThread = true;
 			}
 			General.sleep(150);
 		}
@@ -432,8 +422,10 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 		isItACommand(name, message, botName);
 	}
 	private void kickMessage(String name) {
+		
 		BotFiles.botLogger(("Kick message detected."));
 		String fileName = "kick - "+ name + " - " + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MMM d yyyy HH-mm-ss z")) + ".png";
+		
 		if(Screenshots.take(fileName, false, false))
 		{
 			OssBotMethods.uploadToImgur(fileName, OssBotConstants.IMGUR_KICK_ALBUM_ID);
