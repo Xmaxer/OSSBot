@@ -57,7 +57,6 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 	private static String issuerName = null;
 	private static String issuerCommand = null;
 	private static int issuerRank = -1;
-	private boolean endThread = false;
 	private boolean lock = false;
 	private boolean inCC = false;
 	private boolean loggedIn = false;
@@ -73,7 +72,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			@Override
 			public void run() {
 
-				while(!endThread)
+				while(true)
 				{
 					if(loggedIn && inCC)
 					{
@@ -146,7 +145,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			@Override
 			public void run() {
 
-				while(!endThread)
+				while(true)
 				{
 					if(Login.getLoginState().equals(Login.STATE.INGAME))
 					{
@@ -229,7 +228,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 			@Override
 			public void run() {
-				while(!endThread)
+				while(true)
 				{
 					if(loggedIn && !lock && inCC)
 					{
@@ -287,7 +286,7 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 			@Override
 			public void run() {
-				while(!endThread)
+				while(true)
 				{
 					String link = OssBotConstants.CML_COMP_LINK;
 					BotFiles.downloadCMLComp(link);
@@ -316,22 +315,18 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 			try{
 				if(!webDownloader.isAlive())
 				{
-					endThread = false;
 					webDownloader.start();
 				}
 				if(!announcer.isAlive())
 				{
-					endThread = false;
 					announcer.start();
 				}
 				if(!loginTracker.isAlive())
 				{
-					endThread = false;
 					loginTracker.start();
 				}
 				if(!tracker.isAlive())
 				{
-					endThread = false;
 					tracker.start();
 				}
 			} 
@@ -342,7 +337,10 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				e.printStackTrace(pw);
 				
 				General.println(sw.toString());
-				endThread = true;
+				General.println("Web downloader: " + webDownloader.getState());
+				General.println("Announcer: " + announcer.getState());
+				General.println("Login Tracker: " + loginTracker.getState());
+				General.println("Tracker: " + tracker.getState());
 			}
 			General.sleep(150);
 		}
