@@ -5,15 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.Thread.State;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -21,20 +19,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.input.Keyboard;
 import org.tribot.api.util.Screenshots;
-import org.tribot.api2007.Camera;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.Player;
-import org.tribot.api2007.Walking;
-import org.tribot.api2007.WorldHopper;
-import org.tribot.api2007.types.RSInterface;
-import org.tribot.api2007.types.RSTile;
 import org.tribot.api2007.GameTab.TABS;
-import org.tribot.api2007.Interfaces;
-import org.tribot.api2007.Login;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Ending;
@@ -48,264 +38,54 @@ import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
 import scripts.ossbot.methods.Ranking;
+import scripts.ossbot.threads.Announcer;
+import scripts.ossbot.threads.LoginTracker;
+import scripts.ossbot.threads.Tracker;
+import scripts.ossbot.threads.WebDownloader;
 @ScriptManifest(authors = { "xmax" }, category = "OSSBot", name = "OSSBot", version = 1.00, description = "A bot for all", gameMode = 1)
 
-public class OSSBotV2 extends Script implements MessageListening07,Starting,Ending{
+public class OSSBotV2 extends Script implements MessageListening07, Starting, Ending{
 	private List<Command> validCommands = new ArrayList<Command>();
 
 	private static boolean PM = false;
 	private static String issuerName = null;
 	private static String issuerCommand = null;
 	private static int issuerRank = -1;
-	private boolean lock = false;
-	private boolean inCC = false;
-	private boolean loggedIn = false;
-	private boolean isBanned = false;
-	private long lastClicked = System.currentTimeMillis();
-	private long lastTracked = ZonedDateTime.now().toInstant().toEpochMilli();
+	private static boolean lock = false;
+	private static boolean inCC = false;
+	private static boolean loggedIn = false;
+	private static boolean isBanned = false;
+	private static long lastClicked = System.currentTimeMillis();
+	private static long lastTracked = ZonedDateTime.now().toInstant().toEpochMilli();
+	
+	public static boolean getLock() { return lock; }
+	public static void setLock(boolean lock) { OSSBotV2.lock = lock; }
+	public static boolean getInCC() { return inCC; }
+	public static void setInCC(boolean inCC) { OSSBotV2.inCC = inCC; }
+	public static boolean getLoggedIn() { return loggedIn; }
+	public static void setLoggedIn(boolean loggedIn) { OSSBotV2.loggedIn = loggedIn; }
+	public static boolean getIsBanned() { return isBanned; }
+	public static void setIsBanned(boolean isBanned) { OSSBotV2.isBanned = isBanned; }
+	public static long getLastClicked() { return lastClicked; }
+	public static void setLastClicked(long lastClicked) { OSSBotV2.lastClicked = lastClicked; }
+	public static long getLastTracked() { return lastTracked; }
+	public static void setLastTracked(long lastTracked) { OSSBotV2.lastTracked = lastTracked; }
+	public static void setPM(boolean PM) { OSSBotV2.PM = PM; }
+	public static boolean getPM() { return PM; }
 	
 	@Override
 	public void run() {
 
-		Thread tracker = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				while(true)
-				{
-					if(loggedIn && inCC)
-					{
-						RSInterface memberListParent = Interfaces.get(OssBotConstants.CC_PLAYER_INTERFACE[0], OssBotConstants.CC_PLAYER_INTERFACE[1]);
-
-						if(memberListParent != null)
-						{
-
-							RSInterface[] memberList = memberListParent.getChildren();
-
-							if(memberList != null && memberList.length >= 1)
-							{
-								Long currentMillis = ZonedDateTime.now().toInstant().toEpochMilli();
-								Long diff = currentMillis - lastTracked;
-								if(diff >= 300000L)
-								{
-									BotFiles.trackPlayersInCC(memberList);
-									lastTracked = currentMillis;
-								}
-								for(int i = 0; i < memberList.length; i+=5)
-								{
-									String playerName = OssBotMethods.standardiseName(memberList[i].getText());
-									String playerWorld = memberList[i + 1].getText().replaceAll(" ", "");
-
-									File playerPropertiesDirectory = new File(OssBotConstants.PLAYER_DATA_DIRECTORY + playerName + OssBotConstants.SEPARATOR);
-									playerPropertiesDirectory.mkdirs();
-
-									File playerTimePropertiesFile = new File(OssBotConstants.PLAYER_DATA_DIRECTORY + playerName + OssBotConstants.SEPARATOR + OssBotConstants.PLAYER_TIMING_DATA);
-
-									if(!playerTimePropertiesFile.exists())
-									{
-										if(!lock)
-										{
-											lock = true;
-											PM = false;
-											BotFiles.createPlayerProperties(playerTimePropertiesFile);
-											BotFiles.botLogger("New player: " + playerName);
-											Messenger.messageFormatter("Welcome " + playerName + " to the clan chat!");
-											lock = false;
-										}
-									}
-
-									BotFiles.updateTimeProperties(playerWorld, playerTimePropertiesFile);
-
-									File playerCachePropertiesFile = new File(OssBotConstants.PLAYER_DATA_DIRECTORY + playerName + OssBotConstants.SEPARATOR + OssBotConstants.PLAYER_CACHE_DATA);
-
-									if(!playerCachePropertiesFile.exists())
-									{
-										BotFiles.createPlayerProperties(playerCachePropertiesFile);
-									}
-
-									BotFiles.updateCacheProperties(playerCachePropertiesFile, playerWorld, playerName);
-								}
-							}
-						}
-					}
-					else
-					{
-						BotFiles.botLogger("Not tracking!");
-					}
-
-					General.sleep(1000);
-
-				}
-			}
-		});
-
-		Thread loginTracker = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				while(true)
-				{
-					if(Login.getLoginState().equals(Login.STATE.INGAME))
-					{
-						loggedIn = true;
-						if(GameTab.getOpen().equals(TABS.CLAN))
-						{
-							RSInterface joinButton = Interfaces.get(OssBotConstants.JOIN_CLAN_BUTTON[0], OssBotConstants.JOIN_CLAN_BUTTON[1]);
-							if(joinButton != null)
-							{
-								if(joinButton.getText().toLowerCase().contains("join"))
-								{
-									inCC = false;
-								}
-								else
-								{
-									inCC = true;
-								}
-								if(!inCC)
-								{
-									RSInterface chatInterface = Interfaces.get(OssBotConstants.CHAT_INTERFACE[0], OssBotConstants.CHAT_INTERFACE[1]);
-									while(chatInterface.isHidden())
-									{
-										Clicking.click(joinButton);
-										General.sleep(1000);
-									}
-
-									Keyboard.typeSend("OS Society");
-									General.sleep(4000);
-								}
-							}
-
-						}
-						if(!lock)
-						{
-							RSTile playerPos = Player.getPosition();
-							if(System.currentTimeMillis() - lastClicked >= 120000)
-							{
-								Camera.setCameraAngle(100);
-								Walking.walkTo(playerPos);
-								lastClicked = System.currentTimeMillis();
-							}
-						}
-					}
-					else
-					{
-						loggedIn = false;
-						if(Login.getLoginState().equals(Login.STATE.LOGINSCREEN))
-						{
-							String response = Login.getLoginResponse().toLowerCase();
-
-							if(response.contains("disabled") || response.contains("locked"))
-							{
-								isBanned = true;
-							}
-							else
-							{
-								WorldHopper.changeWorld(83);
-								String[] loginDetails = BotFiles.getLoginDetails();
-								BotFiles.botLogger("Logging in with details: " + Arrays.toString(loginDetails));
-								Login.login(loginDetails[0], loginDetails[1]);
-							}
-						}
-						if(Login.getLoginState().equals(Login.STATE.WELCOMESCREEN))
-						{
-							RSInterface clickToPlayButton = Interfaces.get(378, 6);
-							if(clickToPlayButton != null)
-							{
-								Clicking.click(clickToPlayButton);
-								BotFiles.botLogger("Had to manually click 'play'...");
-							}
-						}
-					}
-					General.sleep(1000);
-				}
-			}
-
-		});
-
-		Thread announcer = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while(true)
-				{
-					if(loggedIn && !lock && inCC)
-					{
-						File[] allAnnouncementDirs = new File(OssBotConstants.ANNOUNCER_DIRECTORY).listFiles();
-
-						if(allAnnouncementDirs != null && allAnnouncementDirs.length > 0)
-						{
-							for(File announcementDir : allAnnouncementDirs)
-							{
-								long now = ZonedDateTime.now().toInstant().toEpochMilli();
-								File propertiesFile = new File(announcementDir + OssBotConstants.SEPARATOR + OssBotConstants.PROPERTY_FILE);
-
-								Properties props = BotFiles.getProperties(propertiesFile);
-
-								Long lastAnnounced = Long.valueOf(props.getProperty("lastAnnounced"));
-								Long interval = Long.valueOf(props.getProperty("interval"));
-								Integer used = Integer.valueOf(props.getProperty("announced"));
-
-								if(lastAnnounced != null && interval != null && (now - lastAnnounced) >= interval)
-								{
-									lock = true;
-									File messageFile = new File(announcementDir + OssBotConstants.SEPARATOR + OssBotConstants.ANNOUNCEMENT_FILE);
-									try {
-										Scanner reader = new Scanner(messageFile);
-										String announcement = "";
-										if(reader.hasNextLine())
-										{
-											announcement = reader.nextLine();
-										}
-										reader.close();
-										PM = false;
-										Messenger.messageFormatter("[" + announcementDir.getName() + "] " + announcement);
-										props.setProperty("lastAnnounced", String.valueOf(now));
-										if(used != null)
-										{
-											used++;
-											props.setProperty("announced", String.valueOf(used));
-										}
-										BotFiles.storeProperties(props, propertiesFile);
-									} catch (Exception e) {
-										OssBotMethods.printException(e);
-									}
-								}
-								lock = false;
-							}
-						}
-					}
-					General.sleep(1000);
-				}
-			}
-
-		});
-
-		Thread webDownloader = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while(true)
-				{
-					String link = OssBotConstants.CML_COMP_LINK;
-					BotFiles.downloadCMLComp(link);
-					link = OssBotConstants.PLAYER_DATA_SHEET_LINK;
-					BotFiles.downloadDataSheet(link);
-					link = OssBotConstants.PLAYER_WINS_LINK;
-					BotFiles.downloadCompDataSheet(link);
-
-
-					BotFiles.transferSheetData();
-					BotFiles.transferCompWinsData();
-
-					//BotFiles.botLogger("Finished updating downloaded data.");
-					General.sleep(180000);
-				}
-
-			}
-
-		});
+		WebDownloader wd = new WebDownloader();
+		Tracker t = new Tracker();
+		Announcer a = new Announcer();
+		LoginTracker lt = new LoginTracker();
+		
+		Thread webDownloader = new Thread(wd);
+		Thread tracker = new Thread(t);
+		Thread announcer = new Thread(a);
+		Thread loginTracker = new Thread(lt);
+		
 		while(!isBanned)
 		{
 			if(!lock && loggedIn)
@@ -313,19 +93,35 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 				GameTab.open(TABS.CLAN);
 			}
 			try{
-				if(!webDownloader.isAlive())
+				if(webDownloader.getState().equals(State.TERMINATED))
+				{
+					webDownloader = new Thread(wd);
+				}
+				else if(!webDownloader.isAlive())
 				{
 					webDownloader.start();
 				}
-				if(!announcer.isAlive())
+				if(announcer.getState().equals(State.TERMINATED))
+				{
+					announcer = new Thread(a);
+				}
+				else if(!announcer.isAlive())
 				{
 					announcer.start();
 				}
-				if(!loginTracker.isAlive())
+				if(loginTracker.getState().equals(State.TERMINATED))
+				{
+					loginTracker = new Thread(lt);
+				}
+				else if(!loginTracker.isAlive())
 				{
 					loginTracker.start();
 				}
-				if(!tracker.isAlive())
+				if(tracker.getState().equals(State.TERMINATED))
+				{
+					tracker = new Thread(t);
+				}
+				else if(!tracker.isAlive())
 				{
 					tracker.start();
 				}
@@ -586,12 +382,6 @@ public class OSSBotV2 extends Script implements MessageListening07,Starting,Endi
 
 			preCommandInitiation();
 		}
-	}
-	private void setPM(boolean PM) {
-		OSSBotV2.PM = PM;
-	}
-	public static boolean getPM() {
-		return PM;
 	}
 	@Override
 	public void playerMessageReceived(String arg0, String arg1) {
