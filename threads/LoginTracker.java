@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.input.Keyboard;
+import org.tribot.api.input.Mouse;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.Interfaces;
@@ -84,7 +85,14 @@ public class LoginTracker implements Runnable {
 						WorldHopper.changeWorld(83);
 						String[] loginDetails = BotFiles.getLoginDetails();
 						BotFiles.botLogger("Logging in with details: " + Arrays.toString(loginDetails));
-						Login.login(loginDetails[0], loginDetails[1]);
+/*						if(Login.login(loginDetails[0], loginDetails[1]))
+						{
+							BotFiles.botLogger("Successfully logged in using default login system.");
+						}
+						else
+						{*/
+							performCustomLogin(loginDetails[0], loginDetails[1]);
+						//}
 					}
 				}
 				if(Login.getLoginState().equals(Login.STATE.WELCOMESCREEN))
@@ -99,6 +107,16 @@ public class LoginTracker implements Runnable {
 			}
 			General.sleep(1000);
 		}
+	}
+
+	private void performCustomLogin(String username, String password) {
+		
+			Mouse.click(525, 280, 1);
+			Mouse.click(320, 250, 1);
+			Keyboard.typeString(username + "\t" + password);
+			Mouse.click(300, 320, 1);
+			BotFiles.botLogger("Logging in using custom login system.");
+			General.sleep(10000);
 	}
 
 }
