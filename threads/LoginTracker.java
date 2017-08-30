@@ -113,7 +113,12 @@ public class LoginTracker implements Runnable {
 		
 			Mouse.click(525, 280, 1);
 			Mouse.click(320, 250, 1);
-			Keyboard.typeString(username + "\t" + password);
+			for(int i = 0; i <= 80; i++)
+				Keyboard.typeString("\b");
+			Keyboard.typeString(username + "\t");
+			for(int i = 0; i <= 80; i++)
+				Keyboard.typeString("\b");
+			Keyboard.typeString(password);
 			Mouse.click(300, 320, 1);
 			BotFiles.botLogger("Logging in using custom login system.");
 			General.sleep(10000);
