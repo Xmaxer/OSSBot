@@ -52,8 +52,8 @@ public abstract class Command {
 	public void setLevel() {
 		
 		String fullCommand = OSSBotV2.getIssuerCommand();
-		this.userCommandParams = OssBotMethods.getcommandParams(fullCommand);
 
+		this.userCommandParams = OssBotMethods.getcommandParams(fullCommand);
 		this.level = OssBotMethods.findMaximumCommandLevel(this.userCommandParams, fullCommand);
 		
 	}

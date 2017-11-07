@@ -4,10 +4,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import scripts.ossbot.commandInterface.Command;
-import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
-import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Calc extends Command{
 	
@@ -21,6 +18,7 @@ public class Calc extends Command{
 		{
 			super.getUserCommandParams()[i] = super.getUserCommandParams()[i].replaceAll("_", " ");
 		}
+		
 		
 		if(super.getLevel() > 0)
 		{
@@ -114,24 +112,5 @@ public class Calc extends Command{
 			
 		}
 		return 0;
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(super.getCommandName()))
-		{
-			BotFiles.addToUsedCounter(super.getCommandName());
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(super.getCommandName());
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 }
