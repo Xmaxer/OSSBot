@@ -4,33 +4,23 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Properties;
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
-import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Help extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertCommandName"}};
-	private int level = 0;
 
 	public Help()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"insertCommandName"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -48,7 +38,7 @@ public class Help extends Command{
 		}
 		Messenger.messageFormatter(output);
 	}
-	private void checkFirstParam(String[] commandParams) {
+	private void checkFirstParam() {
 
 		File[] allCommandDirs = new File(OssBotConstants.COMMAND_FILES_DIRECTORY).listFiles();
 
@@ -61,7 +51,7 @@ public class Help extends Command{
 
 			for(String commandName : commandNames)
 			{
-				if(commandName.equalsIgnoreCase(commandParams[0]))
+				if(commandName.equalsIgnoreCase(super.getUserCommandParams()[0]))
 				{
 					String output = "!!" + commandName + " ";
 					File paramDir = new File(commandDir + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + OssBotConstants.SEPARATOR);
@@ -92,24 +82,4 @@ public class Help extends Command{
 			}
 		}
 	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
 }

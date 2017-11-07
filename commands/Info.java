@@ -8,45 +8,36 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Info extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"vpscredit"}};
-	private int level = 0;
 
 	public Info()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"vpscredit"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
 			Messenger.messageFormatter("This command requires parameters.");
 		}
 	}
-	private void checkFirstParam(String[] commandParams) {
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+	private void checkFirstParam() {
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 		
 		if(realCommandName != null)
 		{
-			if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+			if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][0]))
 			{
 				getVPSCredit();
 			}
@@ -99,24 +90,5 @@ public class Info extends Command{
 		{
 			OssBotMethods.printException(e);
 		}
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 }

@@ -9,28 +9,20 @@ import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Examine extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertName"},{"insertExamine"}};
-	private int level = 0;
 
 	public Examine()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"insertName"},{"insertExamine"}});
 	}
 
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -38,8 +30,8 @@ public class Examine extends Command{
 		}
 	}
 
-	private void checkFirstParam(String[] commandParams) {
-		String name = OssBotMethods.standardiseName(commandParams[0]);
+	private void checkFirstParam() {
+		String name = OssBotMethods.standardiseName(super.getUserCommandParams()[0]);
 		File[] allPlayers = new File(OssBotConstants.PLAYER_DATA_DIRECTORY).listFiles();
 
 		for(File playerDir : allPlayers)
@@ -52,9 +44,9 @@ public class Examine extends Command{
 				{
 					Properties props = BotFiles.getProperties(cacheFile);
 
-					if(level >= 2)
+					if(super.getLevel() >= 2)
 					{
-						if(BotFiles.checkLevelParams("level2", "insertExamine", COMMAND_NAME) != null)
+						if(BotFiles.checkLevelParams("level2", "insertExamine", super.getCommandName()) != null)
 						{
 							String rankString = props.getProperty("lastSeenRank");
 							if(rankString != null)
@@ -63,7 +55,7 @@ public class Examine extends Command{
 
 								if(OSSBotV2.getIssuerRank() >= rank)
 								{
-									String examine = commandParams[1].replaceAll("_", " ");
+									String examine = super.getUserCommandParams()[1].replaceAll("_", " ");
 									if(!examine.isEmpty())
 									{
 										props.setProperty("examine", examine);
@@ -82,7 +74,7 @@ public class Examine extends Command{
 							}
 							else
 							{
-								String examine = commandParams[1].replaceAll("_", " ");
+								String examine = super.getUserCommandParams()[1].replaceAll("_", " ");
 								if(!examine.isEmpty())
 								{
 									Properties props2 = new Properties();
@@ -114,11 +106,11 @@ public class Examine extends Command{
 				}
 				else
 				{
-					if(level >= 2)
+					if(super.getLevel() >= 2)
 					{
-						if(BotFiles.checkLevelParams("level2", "insertExamine", COMMAND_NAME) != null)
+						if(BotFiles.checkLevelParams("level2", "insertExamine", super.getCommandName()) != null)
 						{
-							String examine = commandParams[1].replaceAll("_", " ");
+							String examine = super.getUserCommandParams()[1].replaceAll("_", " ");
 							if(!examine.isEmpty())
 							{
 								Properties props = new Properties();
@@ -142,25 +134,4 @@ public class Examine extends Command{
 		}
 		Messenger.messageFormatter("Couldn't find player: " + name);
 	}
-
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
 }

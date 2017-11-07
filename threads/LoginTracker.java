@@ -91,8 +91,9 @@ public class LoginTracker implements Runnable {
 						}
 						else
 						{*/
-							performCustomLogin(loginDetails[0], loginDetails[1]);
+							//performCustomLogin(loginDetails[0], loginDetails[1]);
 						//}
+						Login.login(loginDetails[0], loginDetails[1]);
 					}
 				}
 				if(Login.getLoginState().equals(Login.STATE.WELCOMESCREEN))

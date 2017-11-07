@@ -15,25 +15,17 @@ import scripts.ossbot.methods.OssBotMethods;
 import scripts.ossbot.methods.Ranking;
 
 public class Config extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 4;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertCommandName"},{"remove", "add", "disable", "change"},{"minimumRank","exception", "restriction","insertBooleanValue","abbreviation"},{"insertPlayerName", "insertRankNumber", "insertAbbreviation"}};
-	private int level = 0;
 
 	public Config()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(4, new String[][]{{"insertCommandName"},{"remove", "add", "disable", "change"},{"minimumRank","exception", "restriction","insertBooleanValue","abbreviation"},{"insertPlayerName", "insertRankNumber", "insertAbbreviation"}});
 	}
 	@Override
 	public void execute() {
 
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
-
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -41,27 +33,8 @@ public class Config extends Command{
 		}
 
 	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
 
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private void checkFirstParam(String[] commandParams) {
+	private void checkFirstParam() {
 
 		File[] allCommandDirs = new File(OssBotConstants.COMMAND_FILES_DIRECTORY).listFiles();
 		for(File commandDir : allCommandDirs)
@@ -74,10 +47,10 @@ public class Config extends Command{
 				String[] commandNames = BotFiles.getDecimalSeparatedProperty(props, "commandNames");
 				for(String commandName : commandNames)
 				{
-					if(commandParams[0].contains("_"))
+					if(super.getUserCommandParams()[0].contains("_"))
 					{
 						File paramDir = new File(commandDir.getAbsolutePath() + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + OssBotConstants.SEPARATOR);
-						String[] params = commandParams[0].split("_");
+						String[] params = super.getUserCommandParams()[0].split("_");
 						if(commandName.equalsIgnoreCase(params[0]))
 						{
 							//Found the command
@@ -112,13 +85,13 @@ public class Config extends Command{
 
 																if(i == params.length - 1)
 																{
-																	if(level >= 2)
+																	if(super.getLevel() >= 2)
 																	{
-																		checkSecondParam(paramConfigFile, paramProps, commandParams);
+																		checkSecondParam(paramConfigFile, paramProps);
 																	}
 																	else
 																	{
-																		Messenger.messageFormatter("One of the level 2 parameters are required: " + Arrays.toString(STATIC_COMMAND_PARAMS[1]));
+																		Messenger.messageFormatter("One of the super.getLevel() 2 parameters are required: " + Arrays.toString(super.getCommandParams()[1]));
 																	}
 																	return;
 																}
@@ -135,10 +108,10 @@ public class Config extends Command{
 												}
 											}
 										}
-										Messenger.messageFormatter("No such command: " + commandParams[0].replaceAll("_", " "));
+										Messenger.messageFormatter("No such command: " + super.getUserCommandParams()[0].replaceAll("_", " "));
 										return;
 									}
-									Messenger.messageFormatter("Too many parameters for: " + commandParams[0].replaceAll("_", " "));
+									Messenger.messageFormatter("Too many parameters for: " + super.getUserCommandParams()[0].replaceAll("_", " "));
 									return;
 								}
 								else
@@ -150,17 +123,17 @@ public class Config extends Command{
 							return;
 						}
 					}
-					if(commandName.equalsIgnoreCase(commandParams[0]))
+					if(commandName.equalsIgnoreCase(super.getUserCommandParams()[0]))
 					{
 						if(Ranking.hasCommandPrivileges(props))
 						{
-							if(level >= 2)
+							if(super.getLevel() >= 2)
 							{
-							checkSecondParam(configFile, props, commandParams);
+							checkSecondParam(configFile, props);
 							}
 							else
 							{
-								Messenger.messageFormatter("One of the level 2 parameters are required: " + Arrays.toString(STATIC_COMMAND_PARAMS[1]));
+								Messenger.messageFormatter("One of the super.getLevel() 2 parameters are required: " + Arrays.toString(super.getCommandParams()[1]));
 							}
 							return;
 						}
@@ -174,9 +147,9 @@ public class Config extends Command{
 	}
 
 
-	private void checkSecondParam(File paramConfigFile, Properties paramProps, String[] commandParams) {
+	private void checkSecondParam(File paramConfigFile, Properties paramProps) {
 
-		File[] levelTwoParams = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + "level2" + OssBotConstants.SEPARATOR).listFiles();
+		File[] levelTwoParams = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + super.getCommandName() + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + "level2" + OssBotConstants.SEPARATOR).listFiles();
 
 		for(File paramDir : levelTwoParams)
 		{
@@ -190,21 +163,21 @@ public class Config extends Command{
 
 				for(String paramName : paramNames)
 				{
-					if(paramName.equalsIgnoreCase(commandParams[1]))
+					if(paramName.equalsIgnoreCase(super.getUserCommandParams()[1]))
 					{
 						if(Ranking.hasCommandPrivileges(commandProps))
 						{
-							for(int i = 0, n = STATIC_COMMAND_PARAMS[1].length; i < n; i++)
+							for(int i = 0, n = super.getCommandParams()[1].length; i < n; i++)
 							{
-								if(paramDir.getName().equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][i]))
+								if(paramDir.getName().equalsIgnoreCase(super.getCommandParams()[1][i]))
 								{
-									if(level >= 3)
+									if(super.getLevel() >= 3)
 									{
-										checkThirdParam(paramConfigFile, paramProps, commandParams, STATIC_COMMAND_PARAMS[1][i]);
+										checkThirdParam(paramConfigFile, paramProps, super.getCommandParams()[1][i]);
 									}
 									else
 									{
-										Messenger.messageFormatter("One of the level 3 parameters are required: " + Arrays.toString(STATIC_COMMAND_PARAMS[2]));
+										Messenger.messageFormatter("One of the super.getLevel() 3 parameters are required: " + Arrays.toString(super.getCommandParams()[2]));
 									}
 									return;
 								}
@@ -216,12 +189,12 @@ public class Config extends Command{
 			}
 		}
 
-		Messenger.messageFormatter("Could not find parameter: " + commandParams[1]);
+		Messenger.messageFormatter("Could not find parameter: " + super.getUserCommandParams()[1]);
 
 	}
-	private void checkThirdParam(File paramConfigFile, Properties paramProps, String[] commandParams, String commandParam) {
+	private void checkThirdParam(File paramConfigFile, Properties paramProps, String commandParam) {
 
-		File[] levelThreeParams = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + "level3" + OssBotConstants.SEPARATOR).listFiles();
+		File[] levelThreeParams = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + super.getCommandName() + OssBotConstants.SEPARATOR + OssBotConstants.PARAMETER_DIRECTORY + "level3" + OssBotConstants.SEPARATOR).listFiles();
 		for(File paramDir : levelThreeParams)
 		{
 			File configFile = new File(paramDir + OssBotConstants.SEPARATOR + OssBotConstants.PROPERTY_FILE);
@@ -230,17 +203,17 @@ public class Config extends Command{
 			{
 				Properties commandProps = BotFiles.getProperties(configFile);
 
-				if((commandParams[2].equalsIgnoreCase("true") || commandParams[2].equalsIgnoreCase("false")) && commandParam.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][2]))
+				if((super.getUserCommandParams()[2].equalsIgnoreCase("true") || super.getUserCommandParams()[2].equalsIgnoreCase("false")) && commandParam.equalsIgnoreCase(super.getCommandParams()[1][2]))
 				{
-					if(paramDir.getName().equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][3]))
+					if(paramDir.getName().equalsIgnoreCase(super.getCommandParams()[2][3]))
 					{
 						if(Ranking.hasCommandPrivileges(commandProps))
 						{
-							checkFourthParam(paramConfigFile, paramProps, commandParams, commandParams[2], commandParam);
+							checkFourthParam(paramConfigFile, paramProps, super.getUserCommandParams()[2], commandParam);
 						}
 						else
 						{
-							Messenger.messageFormatter("You do not have the permission to use the level 3 parameter: " + paramDir.getName() + " (" + commandParams[2] + ") for the command '" + COMMAND_NAME + "'");
+							Messenger.messageFormatter("You do not have the permission to use the super.getLevel() 3 parameter: " + paramDir.getName() + " (" + super.getUserCommandParams()[2] + ") for the command '" + super.getCommandName() + "'");
 						}
 					}
 					else
@@ -253,21 +226,21 @@ public class Config extends Command{
 
 				for(String paramName : paramNames)
 				{
-					if(paramName.equalsIgnoreCase(commandParams[2]))
+					if(paramName.equalsIgnoreCase(super.getUserCommandParams()[2]))
 					{
-						for(int i = 0, n = STATIC_COMMAND_PARAMS[2].length; i < n; i++)
+						for(int i = 0, n = super.getCommandParams()[2].length; i < n; i++)
 						{
-							if(paramDir.getName().equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][i]))
+							if(paramDir.getName().equalsIgnoreCase(super.getCommandParams()[2][i]))
 							{
 								if(Ranking.hasCommandPrivileges(commandProps))
 								{
-									if(level >= 4)
+									if(super.getLevel() >= 4)
 									{
-										checkFourthParam(paramConfigFile, paramProps, commandParams, STATIC_COMMAND_PARAMS[2][i], commandParam);
+										checkFourthParam(paramConfigFile, paramProps, super.getCommandParams()[2][i], commandParam);
 									}
 									else
 									{
-										Messenger.messageFormatter("One of the level 4 parameters are required: " + Arrays.toString(STATIC_COMMAND_PARAMS[3]));
+										Messenger.messageFormatter("One of the super.getLevel() 4 parameters are required: " + Arrays.toString(super.getCommandParams()[3]));
 									}
 								}
 								return;
@@ -277,36 +250,35 @@ public class Config extends Command{
 				}
 			}
 		}
-		Messenger.messageFormatter("Could not find parameter: " + commandParams[2]);
+		Messenger.messageFormatter("Could not find parameter: " + super.getUserCommandParams()[2]);
 	}
 
-	private void checkFourthParam(File paramConfigFile, Properties paramProps, String[] commandParams, String commandParamTwo,
+	private void checkFourthParam(File paramConfigFile, Properties paramProps, String commandParamTwo,
 			String commandParam) {
 
-		if(commandParam.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][0]))
+		if(commandParam.equalsIgnoreCase(super.getCommandParams()[1][0]))
 		{
-			removeCommand(paramConfigFile, paramProps, commandParamTwo, commandParams);
+			removeCommand(paramConfigFile, paramProps, commandParamTwo);
 		}
-		else if(commandParam.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][1]))
+		else if(commandParam.equalsIgnoreCase(super.getCommandParams()[1][1]))
 		{
-			addCommand(paramConfigFile, paramProps, commandParamTwo, commandParams);
+			addCommand(paramConfigFile, paramProps, commandParamTwo);
 		}
-		else if(commandParam.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][2]))
+		else if(commandParam.equalsIgnoreCase(super.getCommandParams()[1][2]))
 		{
-			disableCommand(paramConfigFile, paramProps, commandParams);
+			disableCommand(paramConfigFile, paramProps);
 		}
-		else if(commandParam.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][3]))
+		else if(commandParam.equalsIgnoreCase(super.getCommandParams()[1][3]))
 		{
-			changeCommand(paramConfigFile, paramProps, commandParamTwo, commandParams);
+			changeCommand(paramConfigFile, paramProps, commandParamTwo);
 		}
 
 	}
-	private void changeCommand(File paramConfigFile, Properties paramProps, String commandParamTwo,
-			String[] commandParams) {
+	private void changeCommand(File paramConfigFile, Properties paramProps, String commandParamTwo) {
 
-		if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][0]))
+		if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][0]))
 		{
-			changeminimumRank(paramConfigFile, paramProps, commandParams[3]);
+			changeminimumRank(paramConfigFile, paramProps, super.getUserCommandParams()[3]);
 		}
 
 	}
@@ -324,15 +296,14 @@ public class Config extends Command{
 			Messenger.messageFormatter(stringRank + " is not a valid rank.");
 		}
 	}
-	private void disableCommand(File paramConfigFile, Properties paramProps,
-			String[] commandParams) {
+	private void disableCommand(File paramConfigFile, Properties paramProps) {
 
-		if(commandParams[2].equalsIgnoreCase("true"))
+		if(super.getUserCommandParams()[2].equalsIgnoreCase("true"))
 		{
 			paramProps.setProperty("nameRestrictions", OSSBotV2.getIssuerName());
 			Messenger.messageFormatter("Command disabled.");
 		}
-		else if(commandParams[2].equalsIgnoreCase("false"))
+		else if(super.getUserCommandParams()[2].equalsIgnoreCase("false"))
 		{
 			paramProps.setProperty("nameRestrictions", "");
 			Messenger.messageFormatter("Command enabled. All restrictions removed");
@@ -344,20 +315,19 @@ public class Config extends Command{
 		}
 		BotFiles.storeProperties(paramProps, paramConfigFile);
 	}
-	private void addCommand(File paramConfigFile, Properties paramProps, String commandParamTwo,
-			String[] commandParams) {
+	private void addCommand(File paramConfigFile, Properties paramProps, String commandParamTwo) {
 
-		if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][1]))
+		if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][1]))
 		{
-			addException(paramConfigFile, paramProps, OssBotMethods.standardiseName(commandParams[3]));
+			addException(paramConfigFile, paramProps, OssBotMethods.standardiseName(super.getUserCommandParams()[3]));
 		}
-		else if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][2]))
+		else if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][2]))
 		{
-			addRestriction(paramConfigFile, paramProps, OssBotMethods.standardiseName(commandParams[3]));
+			addRestriction(paramConfigFile, paramProps, OssBotMethods.standardiseName(super.getUserCommandParams()[3]));
 		}
-		else if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][4]))
+		else if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][4]))
 		{
-			addAbbreviation(paramConfigFile, paramProps, commandParams[3]);
+			addAbbreviation(paramConfigFile, paramProps, super.getUserCommandParams()[3]);
 		}
 
 	}
@@ -405,21 +375,20 @@ public class Config extends Command{
 
 	}
 
-	private void removeCommand(File paramConfigFile, Properties paramProps, String commandParamTwo,
-			String[] commandParams) {
+	private void removeCommand(File paramConfigFile, Properties paramProps, String commandParamTwo) {
 
 
-		if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][1]))
+		if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][1]))
 		{
-			removeException(paramConfigFile, paramProps, OssBotMethods.standardiseName(commandParams[3]));
+			removeException(paramConfigFile, paramProps, OssBotMethods.standardiseName(super.getUserCommandParams()[3]));
 		}
-		else if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][2]))
+		else if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][2]))
 		{
-			removeRestriction(paramConfigFile, paramProps, OssBotMethods.standardiseName(commandParams[3]));
+			removeRestriction(paramConfigFile, paramProps, OssBotMethods.standardiseName(super.getUserCommandParams()[3]));
 		}
-		else if(commandParamTwo.equalsIgnoreCase(STATIC_COMMAND_PARAMS[2][4]))
+		else if(commandParamTwo.equalsIgnoreCase(super.getCommandParams()[2][4]))
 		{
-			removeAbbreviation(paramConfigFile, paramProps, commandParams[3]);
+			removeAbbreviation(paramConfigFile, paramProps, super.getUserCommandParams()[3]);
 		}
 
 	}

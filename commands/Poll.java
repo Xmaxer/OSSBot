@@ -18,27 +18,19 @@ import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Poll extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"comp"},{"vote", "create"},{"insertVoteHere", "insertThreeSkills"}};
-	private int level = 0;
 
 	public Poll()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"comp"},{"vote", "create"},{"insertVoteHere", "insertThreeSkills"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -46,38 +38,38 @@ public class Poll extends Command{
 		}
 
 	}
-	private void checkFirstParam(String[] commandParams) {
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+	private void checkFirstParam() {
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 
 		if(realCommandName != null)
 		{
-			if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+			if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][0]))
 			{
-				if(level == 1)
+				if(super.getLevel() == 1)
 				{
 					getCurrentCompPoll();
 				}
 				else
 				{
-					compPolling(commandParams);
+					compPolling();
 				}
 			}
 		}
 	}
-	private void compPolling(String[] commandParams) {
-		String realCommandName = BotFiles.checkLevelParams("level2", commandParams[1], COMMAND_NAME);
+	private void compPolling() {
+		String realCommandName = BotFiles.checkLevelParams("level2", super.getUserCommandParams()[1], super.getCommandName());
 
 		if(realCommandName != null)
 		{
-			if(level >= 3)
+			if(super.getLevel() >= 3)
 			{
-				if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][0]))
+				if(realCommandName.equalsIgnoreCase(super.getCommandParams()[1][0]))
 				{
-					voteInCompPoll(commandParams[2]);
+					voteInCompPoll(super.getUserCommandParams()[2]);
 				}
-				else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[1][1]))
+				else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[1][1]))
 				{
-					createNewCompPoll(commandParams[2]);
+					createNewCompPoll(super.getUserCommandParams()[2]);
 				}
 			}
 		}
@@ -229,24 +221,5 @@ public class Poll extends Command{
 		}
 		Messenger.messageFormatter(vote + " is not a valid vote. Try: " + allProps);
 
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 }

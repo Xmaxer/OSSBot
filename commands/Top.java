@@ -9,33 +9,24 @@ import java.util.Scanner;
 
 import org.tribot.api2007.Player;
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Top extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"comp", "charstyped", "timespent", "commandused"}};
-	private int level = 0;
 
 	public Top()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"comp", "charstyped", "timespent", "commandused"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -43,24 +34,24 @@ public class Top extends Command{
 		}
 	}
 
-	private void checkFirstParam(String[] commandParams) {
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+	private void checkFirstParam() {
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 
 		if(realCommandName != null)
 		{
-			if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+			if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][0]))
 			{
 				topComp();
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][1]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][1]))
 			{
 				topCharsTyped();
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][2]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][2]))
 			{
 				topTimeSpent();
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][3]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][3]))
 			{
 				topCommandUsed();
 			}
@@ -252,24 +243,4 @@ public class Top extends Command{
 		}
 
 	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
 }

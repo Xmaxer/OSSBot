@@ -24,24 +24,17 @@ import scripts.ossbot.methods.OssBotMethods;
 import scripts.ossbot.methods.Ranking;
 
 public class Data extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"favworld", "favchar", "chars", "time", "joindate", "comprank", "lastseen", "lastworld", "rank", "days", "compmoney"},{"insertplayername"}};
-	private int level = 0;
 
 	public Data()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"favworld", "favchar", "chars", "time", "joindate", "comprank", "lastseen", "lastworld", "rank", "days", "compmoney"},{"insertplayername"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -49,55 +42,55 @@ public class Data extends Command{
 		}
 	}
 
-	private void checkFirstParam(String[] commandParams) {
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+	private void checkFirstParam() {
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 
 		if(realCommandName != null)
 		{
-			String playerName = (commandParams.length >= 2) ? commandParams[1] : OSSBotV2.getIssuerName();
+			String playerName = (super.getUserCommandParams().length >= 2) ? super.getUserCommandParams()[1] : OSSBotV2.getIssuerName();
 
 
-			if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+			if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][0]))
 			{
 				getFavWorld(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][1]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][1]))
 			{
 				getFavChar(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][2]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][2]))
 			{
 				getChars(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][3]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][3]))
 			{
 				getTime(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][4]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][4]))
 			{
 				getJoindate(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][5]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][5]))
 			{
 				getComprank(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][6]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][6]))
 			{
 				getLastseen(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][7]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][7]))
 			{
 				getLastworld(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][8]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][8]))
 			{
 				getRank(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][9]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][9]))
 			{
 				getDays(playerName);
 			}
-			else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][10]))
+			else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][10]))
 			{
 				getCompWins(playerName);
 			}
@@ -548,25 +541,4 @@ public class Data extends Command{
 		Messenger.messageFormatter(playerName + " could not be found.");
 
 	}
-
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
 }

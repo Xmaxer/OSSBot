@@ -1,32 +1,20 @@
 package scripts.ossbot.commands;
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
-import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
-import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Caps extends Command{
 
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {};
-	private int level = 0;
-
 	public Caps()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 		
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			capitalise(commandParams);
+			capitalise();
 		}
 		else
 		{
@@ -35,14 +23,14 @@ public class Caps extends Command{
 
 	}
 
-	private void capitalise(String[] commandParams) {
+	private void capitalise() {
 		
-		for(int i = 0, n = commandParams.length; i < n; i ++)
+		for(int i = 0, n = super.getUserCommandParams().length; i < n; i ++)
 		{
-			commandParams[i] = commandParams[i].replaceAll("_", "").toUpperCase();
+			super.getUserCommandParams()[i] = super.getUserCommandParams()[i].replaceAll("_", "").toUpperCase();
 		}
 		
-		char[] allChars = String.join(" ", commandParams).toCharArray();
+		char[] allChars = String.join(" ", super.getUserCommandParams()).toCharArray();
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -52,25 +40,6 @@ public class Caps extends Command{
 		}
 		
 		Messenger.messageFormatter(sb.toString());
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 
 }

@@ -20,23 +20,20 @@ import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Cleanup extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 5;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {};
 
-	public enum Flags {
+	private enum Flags {
 		RANKED_BUT_NO_SHEET_DATA,
 		SHEET_DATA_BUT_NO_BOT_DATA,
 		RANK_MISMATCH,
 		INACTIVE,
 		SHEET_UNRANKED
 	}
+	
 	public Cleanup()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(5, new String[][]{});
 	}
 	@Override
 	public void execute() {
@@ -296,24 +293,5 @@ public class Cleanup extends Command{
 			Messenger.messageFormatter("Error occured during pastebin connection.");
 		}
 		return null;
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 }

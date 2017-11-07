@@ -11,27 +11,20 @@ import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class CML extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertSkill", "update"},{"insertInterval"},{"insertName"}};
-	private int level = 0;
 
 	public CML()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"insertSkill", "update"},{"insertInterval"},{"insertName"}});
 	}
+	
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -39,26 +32,26 @@ public class CML extends Command{
 		}
 	}
 
-	private void checkFirstParam(String[] commandParams) {
-		if(commandParams[0].equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+	private void checkFirstParam() {
+		if(super.getUserCommandParams()[0].equalsIgnoreCase(super.getCommandParams()[0][0]))
 		{
 			return;
 		}
 
 		String playerName = OSSBotV2.getIssuerName();
-		if(level == 3)
+		if(super.getLevel() == 3)
 		{
-			playerName = OssBotMethods.standardiseName(commandParams[2]);
+			playerName = OssBotMethods.standardiseName(super.getUserCommandParams()[2]);
 		}
 		for(int i = 0, skills = OssBotConstants.ALL_SKILLS.length; i < skills; i++)
 		{
 			for(int j = 0, abvs = OssBotConstants.ALL_SKILLS[i].length; j < abvs; j++)
 			{
-				if(OssBotConstants.ALL_SKILLS[i][j].equalsIgnoreCase(commandParams[0]))
+				if(OssBotConstants.ALL_SKILLS[i][j].equalsIgnoreCase(super.getUserCommandParams()[0]))
 				{
-					if(level >= 2)
+					if(super.getLevel() >= 2)
 					{
-						getCMLXP(OssBotConstants.ALL_SKILLS[i][0],OssBotConstants.ALL_SKILLS[i][1], playerName, commandParams[1]);
+						getCMLXP(OssBotConstants.ALL_SKILLS[i][0],OssBotConstants.ALL_SKILLS[i][1], playerName, super.getUserCommandParams()[1]);
 					}
 					else
 					{
@@ -68,7 +61,7 @@ public class CML extends Command{
 				}
 			}
 		}
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 
 		if(realCommandName != null)
 		{
@@ -167,25 +160,6 @@ public class CML extends Command{
 		}
 		
 		Messenger.messageFormatter(output);
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 
 }

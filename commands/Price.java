@@ -8,33 +8,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
-import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Price extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertAmount"},{"insertItemName"}};
-	private int level = 0;
 
 	public Price()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"insertAmount"},{"insertItemName"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
@@ -42,9 +32,9 @@ public class Price extends Command{
 		}
 	}
 
-	private void checkFirstParam(String[] commandParams) {
+	private void checkFirstParam() {
 
-		if(level > 2)
+		if(super.getLevel() > 2)
 		{
 			Messenger.messageFormatter("Use apostrophe to specify an item name with spaces.");
 			return;
@@ -53,20 +43,20 @@ public class Price extends Command{
 		String itemToLookFor = "";
 		Integer quantity = 1;
 		Integer multiplier = 1;
-		if(level == 1)
+		if(super.getLevel() == 1)
 		{
-			itemToLookFor = commandParams[0].toLowerCase().replaceAll("_", " ");
+			itemToLookFor = super.getUserCommandParams()[0].toLowerCase().replaceAll("_", " ");
 		}
 		else
 		{
 			try{
-			quantity = Integer.valueOf(commandParams[0]);
+				quantity = Integer.valueOf(super.getUserCommandParams()[0]);
 			} catch(NumberFormatException e)
 			{
 				Messenger.messageFormatter("Number formatting exception. Did you use apostrophes?");
 				return;
 			}
-			itemToLookFor = commandParams[1].toLowerCase().replaceAll("_", " ");
+			itemToLookFor = super.getUserCommandParams()[1].toLowerCase().replaceAll("_", " ");
 		}
 		File[] allItemsInDB = new File(OssBotConstants.ITEM_DATABASE_DIRECTORY).listFiles();
 		for(File item : allItemsInDB)
@@ -92,10 +82,10 @@ public class Price extends Command{
 
 						String GEData = BotFiles.getLinkData(OssBotConstants.GE_LINK + itemID);
 						String OSBData = BotFiles.getLinkData(OssBotConstants.OSB_LINK + itemID);
-						
+
 						Matcher matcherGE = Pattern.compile("neutral\",\"price\":(.*?)\\}").matcher(GEData);
 						Matcher matcherOSB = Pattern.compile("\"selling\":(\\d*),").matcher(OSBData);
-						
+
 						if(matcherGE.find())
 						{
 							String extractedValue = matcherGE.group(1).replaceAll("[\",]*", "");
@@ -124,10 +114,10 @@ public class Price extends Command{
 						{
 							tooLarge = true;
 						}
-						
+
 						String toPrintGE = String.valueOf((GEPrice.equals(0)) ? "unknown" : NumberFormat.getNumberInstance(Locale.US).format(GEPrice));
 						String toPrintOSB = String.valueOf((OSBPrice.equals(0)) ? "unknown" : NumberFormat.getNumberInstance(Locale.US).format(OSBPrice));
-						
+
 						if(quantity >= 2)
 						{
 							toPrintOSB = String.valueOf((OSBPrice.equals(0)) ? "unknown" : "(" + NumberFormat.getNumberInstance(Locale.US).format(OSBPrice/quantity) + ") " + NumberFormat.getNumberInstance(Locale.US).format(OSBPrice));
@@ -151,25 +141,4 @@ public class Price extends Command{
 		}
 		Messenger.messageFormatter("Couldn't find item: " + itemToLookFor);
 	}
-
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
-	}
-
 }

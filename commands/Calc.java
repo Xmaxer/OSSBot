@@ -3,7 +3,6 @@ package scripts.ossbot.commands;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
@@ -11,28 +10,21 @@ import scripts.ossbot.methods.OssBotMethods;
 import scripts.ossbot.methods.Ranking;
 
 public class Calc extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"insertCalculation"}};
-	private int level = 0;
 	
 	public Calc()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"insertCalculation"}});
 	}
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
-
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
 		
-		for(int i = 0; i < commandParams.length; i++)
+		for(int i = 0; i < super.getUserCommandParams().length; i++)
 		{
-			commandParams[i] = commandParams[i].replaceAll("_", " ");
+			super.getUserCommandParams()[i] = super.getUserCommandParams()[i].replaceAll("_", " ");
 		}
-		if(level > 0)
+		
+		if(super.getLevel() > 0)
 		{
-			Messenger.messageFormatter(NumberFormat.getNumberInstance(Locale.US).format(eval(String.join(" ", commandParams))));
+			Messenger.messageFormatter(NumberFormat.getNumberInstance(Locale.US).format(eval(String.join(" ", super.getUserCommandParams()))));
 		}
 		else
 		{
@@ -125,9 +117,9 @@ public class Calc extends Command{
 	}
 	@Override
 	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
+		if(Ranking.checkPermissions(super.getCommandName()))
 		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
+			BotFiles.addToUsedCounter(super.getCommandName());
 			return true;
 		}
 		return false;
@@ -135,7 +127,7 @@ public class Calc extends Command{
 
 	@Override
 	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
+		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(super.getCommandName());
 		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
 		{
 			return true;

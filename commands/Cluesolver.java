@@ -5,58 +5,49 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-import scripts.ossbot.OSSBotV2;
 import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
 import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
-import scripts.ossbot.methods.Ranking;
 
 public class Cluesolver extends Command{
-	private final int DEFAULT_RANK_REQUIREMENT = 0;
-	private final String COMMAND_NAME = this.getClass().getSimpleName();
-	private final String[][] STATIC_COMMAND_PARAMS = {{"cipher", "cryptic", "anagram"},{"insertToLookFor"}};
-	private int level = 0;
 
 	public Cluesolver()
 	{
-		BotFiles.checkProperties(COMMAND_NAME, DEFAULT_RANK_REQUIREMENT, STATIC_COMMAND_PARAMS);
+		super(0, new String[][]{{"cipher", "cryptic", "anagram"},{"insertToLookFor"}});
 	}
 	@Override
 	public void execute() {
-		String fullCommand = OSSBotV2.getIssuerCommand();
-		String[] commandParams = OssBotMethods.getcommandParams(fullCommand);
 
-		level = OssBotMethods.findMaximumCommandLevel(commandParams, fullCommand);
-		if(level > 0)
+		if(super.getLevel() > 0)
 		{
-			checkFirstParam(commandParams);
+			checkFirstParam();
 		}
 		else
 		{
 			Messenger.messageFormatter("This command requires parameters.");
 		}
 	}
-	private void checkFirstParam(String[] commandParams) {
+	private void checkFirstParam() {
 
-		String realCommandName = BotFiles.checkLevelParams("level1", commandParams[0], COMMAND_NAME);
+		String realCommandName = BotFiles.checkLevelParams("level1", super.getUserCommandParams()[0], super.getCommandName());
 
 		if(realCommandName != null)
 		{
-			if(level == 2)
+			if(super.getLevel() == 2)
 			{
-				if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][0]))
+				if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][0]))
 				{
-					getCipher(commandParams[1]);
+					getCipher();
 				}
-				else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][1]))
+				else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][1]))
 				{
-					getCryptic(commandParams[1]);
+					getCryptic();
 				}
-				else if(realCommandName.equalsIgnoreCase(STATIC_COMMAND_PARAMS[0][2]))
+				else if(realCommandName.equalsIgnoreCase(super.getCommandParams()[0][2]))
 				{
-					getAnagram(commandParams[1]);
+					getAnagram();
 				}
 			}
 			else
@@ -66,12 +57,12 @@ public class Cluesolver extends Command{
 			}
 		}
 	}
-	private void getAnagram(String anagramToLookFor) {
-		File anagramFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.ANAGRAM_FILE);
+	private void getAnagram() {
+		File anagramFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + super.getCommandName() + OssBotConstants.SEPARATOR + OssBotConstants.ANAGRAM_FILE);
 
 		ArrayList<String[]> data = getData(anagramFile);
 
-		anagramToLookFor = anagramToLookFor.toLowerCase().replaceAll("_", " ");
+		String anagramToLookFor = super.getUserCommandParams()[1].toLowerCase().replaceAll("_", " ");
 
 		for(String[] dataPiece : data)
 		{
@@ -89,12 +80,12 @@ public class Cluesolver extends Command{
 		Messenger.messageFormatter("Couldn't find anagram: " + anagramToLookFor);
 
 	}
-	private void getCryptic(String crypticToLookFor) {
-		File crypticFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.CRYPTIC_FILE);
+	private void getCryptic() {
+		File crypticFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + super.getCommandName() + OssBotConstants.SEPARATOR + OssBotConstants.CRYPTIC_FILE);
 
 		ArrayList<String[]> data = getData(crypticFile);
 
-		crypticToLookFor = crypticToLookFor.toLowerCase().replaceAll("_", " ");
+		String crypticToLookFor = super.getUserCommandParams()[1].toLowerCase().replaceAll("_", " ");
 
 		for(String[] dataPiece : data)
 		{
@@ -112,13 +103,13 @@ public class Cluesolver extends Command{
 		Messenger.messageFormatter("Couldn't find crypt: " + crypticToLookFor);
 
 	}
-	private void getCipher(String cipherToLookFor) {
+	private void getCipher() {
 
-		File cipherFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + COMMAND_NAME + OssBotConstants.SEPARATOR + OssBotConstants.CIPHER_FILE);
+		File cipherFile = new File(OssBotConstants.COMMAND_FILES_DIRECTORY + super.getCommandName() + OssBotConstants.SEPARATOR + OssBotConstants.CIPHER_FILE);
 
 		ArrayList<String[]> data = getData(cipherFile);
 
-		cipherToLookFor = cipherToLookFor.toLowerCase().replaceAll("_", " ");
+		String cipherToLookFor = super.getUserCommandParams()[1].toLowerCase().replaceAll("_", " ");
 
 		for(String[] dataPiece : data)
 		{
@@ -153,24 +144,5 @@ public class Cluesolver extends Command{
 			}
 		}
 		return null;
-	}
-	@Override
-	public boolean canExecute() {
-		if(Ranking.checkPermissions(COMMAND_NAME))
-		{
-			BotFiles.addToUsedCounter(COMMAND_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCallNames() {
-		String[] VALID_COMMAND_NAMES = BotFiles.getValidCommandNames(COMMAND_NAME);
-		if(OssBotMethods.isThisCommandCalled(VALID_COMMAND_NAMES))
-		{
-			return true;
-		}
-		return false;
 	}
 }
