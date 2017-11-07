@@ -2,6 +2,7 @@ package scripts.ossbot.constants;
 
 import java.nio.file.Paths;
 
+import scripts.ossbot.hidden.SensitiveData;
 import scripts.ossbot.methods.OssBotMethods;
 
 public final class OssBotConstants {
@@ -69,9 +70,9 @@ public final class OssBotConstants {
 	public final static String ANAGRAM_FILE = "anagrams.txt";
 	public final static String CIPHER_FILE = "ciphers.txt";
 	public final static String CRYPTIC_FILE = "cryptics.txt";
-	public final static String PASTE_BIN_API_KEY = "***REMOVED***";
-	public final static String PASTE_BIN_USER_KEY = "***REMOVED***";
+	public final static String PASTE_BIN_API_KEY = SensitiveData.PASTE_BIN_API_KEY;
+	public final static String PASTE_BIN_USER_KEY = SensitiveData.PASTE_BIN_USER_KEY;
 	public final static Long INACTIVITY_ALLOWED = OssBotMethods.getTimeInMillis("2w");
-	public final static String VULTR_API_KEY = "***REMOVED***";
+	public final static String VULTR_API_KEY = SensitiveData.VULTR_API_KEY;
 }
 
