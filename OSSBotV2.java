@@ -396,10 +396,10 @@ public class OSSBotV2 extends Script implements MessageListening07, Starting, En
 
 	@Override
 	public void tradeRequestReceived(String name) {
-		lock = true;
+/*		lock = true;
 		PM = false;
 		Keyboard.typeSend("Beep boop I am a bot. Trading me does nothing.");
 		Messenger.messageFormatter(name + " has traded me! Why? Fuck do I know. I am a bot. Beep boop.");
-		lock = false;
+		lock = false;*/
 	}
 }
