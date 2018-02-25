@@ -74,5 +74,6 @@ public final class OssBotConstants {
 	public final static String PASTE_BIN_USER_KEY = SensitiveData.PASTE_BIN_USER_KEY;
 	public final static Long INACTIVITY_ALLOWED = OssBotMethods.getTimeInMillis("2w");
 	public final static String VULTR_API_KEY = SensitiveData.VULTR_API_KEY;
+	public final static String OSB_SUMMARY_URL = "https://rsbuddy.com/exchange/summary.json";
 }
 

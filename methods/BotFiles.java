@@ -2,6 +2,7 @@ package scripts.ossbot.methods;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -298,9 +300,8 @@ public class BotFiles {
 			}
 
 			return sb.toString();
-
-		}catch(IOException e)
-		{
+		}
+		catch(IOException e) {
 
 		}
 		catch (Exception e) {
@@ -746,7 +747,7 @@ public class BotFiles {
 		try{
 			dayAverages.delete();
 		} catch(Exception e){}
-		
+
 		try{
 			dayAverages.createNewFile();
 
@@ -854,5 +855,85 @@ public class BotFiles {
 		BotFiles.botLogger("Couldn't find parameter for: " + command);
 		Messenger.messageFormatter("Couldn't find parameter: " + command);
 		return null;
+	}
+
+	public static int findNewItems()
+	{
+		int numberOfNewItems = 0;
+		List<String> names = Arrays.asList(Arrays.stream(new File(OssBotConstants.ITEM_DATABASE_DIRECTORY).listFiles()).map(file -> file.getName().replace(".txt", "")).toArray(String[]::new));
+
+		String data = getLinkData(OssBotConstants.OSB_SUMMARY_URL);
+		Matcher m = Pattern.compile("\"(\\d*)\".*?\"name\": \"([^,]*)\"").matcher(data);
+
+		while(m.find())
+		{
+			if(m.groupCount() == 2 && !names.contains(m.group(2).replaceAll("/", "")))
+			{
+				try {
+					String itemName = m.group(2).replaceAll("/", "");
+					General.println("Item '" + itemName + "' didn't exist.");
+					File newItem = new File(OssBotConstants.ITEM_DATABASE_DIRECTORY + itemName + ".txt");
+					newItem.createNewFile();
+
+					FileWriter fw = new FileWriter(newItem, true);
+					String item = getLinkData(OssBotConstants.GE_LINK + m.group(1));
+
+					long time = System.currentTimeMillis();
+					while((item == null || item.isEmpty()) && (System.currentTimeMillis() - time) <= OssBotConstants.TIMEOUT_DURATION*1000)
+					{
+						General.println("Waiting till GE Api responds...");
+						General.sleep(1000);
+						item = getLinkData(OssBotConstants.GE_LINK + m.group(1));
+					}
+					General.println(item);
+					fw.write((item == null) ? "" : item);
+					numberOfNewItems++;
+					fw.close();
+				} catch (IOException e) {
+					OssBotMethods.printException(e);
+				}
+			}
+		}
+
+		return numberOfNewItems;
+	}
+
+	public static int cleanupItemDB()
+	{
+		int result = 0;
+		File[] allFiles = new File(OssBotConstants.ITEM_DATABASE_DIRECTORY).listFiles();
+
+		for(File file : allFiles)
+		{
+			try {
+				Scanner s = new Scanner(file);
+				if(s.hasNextLine())
+				{
+					Matcher m = Pattern.compile("\"item\":").matcher(s.nextLine());
+					if(m.find())
+					{
+						s.close();
+						continue;
+					}
+					else
+					{
+						result++;
+						s.close();
+						file.delete();
+					}
+				}
+				else
+				{
+					result++;
+					s.close();
+					file.delete();
+				}
+				s.close();
+			} catch (FileNotFoundException e) {
+				OssBotMethods.printException(e);
+			}
+
+		}
+		return result;
 	}
 }

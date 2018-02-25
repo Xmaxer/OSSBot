@@ -17,7 +17,7 @@ public class Price extends Command{
 
 	public Price()
 	{
-		super(0, new String[][]{{"insertAmount"},{"insertItemName"}});
+		super(0, new String[][]{{"insertAmount","update", "cleanup"},{"insertItemName"}});
 	}
 	@Override
 	public void execute() {
@@ -45,6 +45,25 @@ public class Price extends Command{
 		Integer multiplier = 1;
 		if(super.getLevel() == 1)
 		{
+			//Forced check (the parameter must be 'update' exactly) because we don't want people to make an abbreviation for 'update' that is also an item name.
+			if(super.getCommandParams()[0][1].equalsIgnoreCase(super.getUserCommandParams()[0]))
+			{
+				int result = BotFiles.findNewItems();
+				if(result == 0)
+					Messenger.messageFormatter("Couldn't find any new items.");
+				else
+					Messenger.messageFormatter("Found " + result + " new items, successfully updated.");
+				return;
+			}
+			else if(super.getCommandParams()[0][2].equalsIgnoreCase(super.getUserCommandParams()[0]))
+			{
+				int result = BotFiles.cleanupItemDB();
+				if(result == 0)
+					Messenger.messageFormatter("Couldn't find broken item files.");
+				else
+					Messenger.messageFormatter("Deleted " + result + " files.");
+				return;
+			}
 			itemToLookFor = super.getUserCommandParams()[0].toLowerCase().replaceAll("_", " ");
 		}
 		else

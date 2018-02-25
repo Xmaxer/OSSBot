@@ -35,7 +35,6 @@ import scripts.ossbot.commandInterface.Command;
 import scripts.ossbot.commands.*;
 import scripts.ossbot.constants.OssBotConstants;
 import scripts.ossbot.methods.BotFiles;
-import scripts.ossbot.methods.Messenger;
 import scripts.ossbot.methods.OssBotMethods;
 import scripts.ossbot.methods.Ranking;
 import scripts.ossbot.threads.Announcer;
