@@ -181,7 +181,8 @@ public class OSSBotV2 extends Script implements MessageListening07, Starting, En
 				new Qfc(),
 				new Cleanup(),
 				new Info(),
-				new Reverse());
+				new Reverse(),
+				new Vote());
 
 		General.println("Commands created.");
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

@@ -71,7 +71,7 @@ public class CML extends Command{
 	}
 	private void updateCML() {
 		String name = OSSBotV2.getIssuerName();
-		int response = Integer.valueOf(BotFiles.getLinkData(OssBotConstants.CML_UPDATE_LINK + name));
+		int response = Integer.valueOf(BotFiles.getLinkData(OssBotConstants.CML_UPDATE_LINK + name).replace("﻿", ""));
 		String output = "";
 		switch(response)
 		{
@@ -104,7 +104,7 @@ public class CML extends Command{
 	private void getCMLXP(String skill,String number, String playerName, String interval) {
 		Long timeIntervalLong = OssBotMethods.getTimeInMillis(interval);
 		String timeInterval = OssBotMethods.getIntervalFromMillis(timeIntervalLong);
-		String xpData = BotFiles.getLinkData(OssBotConstants.CML_TRACKING_LINK + playerName + "&time=" + timeInterval);
+		String xpData = BotFiles.getLinkData(OssBotConstants.CML_TRACKING_LINK + playerName + "&time=" + timeInterval).replace("﻿", "");
 		String output = "";
 		int skillNumber = Integer.valueOf(number);
 		if(xpData.length() >= 10)

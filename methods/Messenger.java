@@ -15,7 +15,7 @@ import scripts.ossbot.constants.OssBotConstants;
 
 public class Messenger {
 	public static void messageFormatter(String finalMessage) {
-
+		
 		int messageLength = finalMessage.length();
 		ArrayList<String> messageParts = new ArrayList<String>();
 
@@ -27,31 +27,41 @@ public class Messenger {
 		{
 			messageParts.add(finalMessage);
 		}
-		if(!OSSBotV2.getPM())
-		{
+/*		if(!OSSBotV2.getPM())
+		{*/
 			for(int i = 0; i < messageParts.size(); i++)
 			{
 				messageParts.set(i, "/" + messageParts.get(i));
 			}
-		}
-		else
+/*		}*/
+/*		else
 		{
 			GameTab.open(TABS.FRIENDS);
 			OssBotMethods.addPlayer();
-		}
+		}*/
 		typer(messageParts);
+	}
+	public static void messageFormatter(String finalMessage, boolean override)
+	{
+		if(override)
+		{
+			OSSBotV2.setPM(false);
+			messageFormatter(finalMessage);
+		}
+		else
+			messageFormatter(finalMessage);
 	}
 	private static void typer(ArrayList<String> messageParts) {
 
-		if(!OSSBotV2.getPM())
-		{
+/*		if(!OSSBotV2.getPM())
+		{*/
 			while(!messageParts.isEmpty())
 			{
 				Keyboard.typeSend(messageParts.get(0));
 				messageParts.remove(0);
 			}
-		}
-		else
+		//}
+		/*else
 		{
 			while(!messageParts.isEmpty())
 			{
@@ -80,7 +90,7 @@ public class Messenger {
 					}
 				}
 			}
-		}
+		}*/
 	}
 	private static ArrayList<String> messageSplitter(String finalMessage, int messageLength) {
 		ArrayList<String> messageParts = new ArrayList<String>();

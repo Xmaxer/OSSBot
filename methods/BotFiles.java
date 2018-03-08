@@ -323,7 +323,7 @@ public class BotFiles {
 				if(ID != null)
 				{
 					link += ID;
-					String dataSheet = getLinkData(link);
+					String dataSheet = getLinkData(link).replace("﻿", "");
 					if(dataSheet != null)
 					{
 						String[] allData = dataSheet.split("\\s");
