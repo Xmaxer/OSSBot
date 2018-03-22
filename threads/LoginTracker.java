@@ -98,7 +98,7 @@ public class LoginTracker implements Runnable {
 				}
 				if(Login.getLoginState().equals(Login.STATE.WELCOMESCREEN))
 				{
-					RSInterface clickToPlayButton = Interfaces.get(378, 6);
+					RSInterface clickToPlayButton = Interfaces.get(378, 76);
 					if(clickToPlayButton != null)
 					{
 						Clicking.click(clickToPlayButton);
